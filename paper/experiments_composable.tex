@@ -1,0 +1,208 @@
+In order to test the suitability of our model for recognition of complex and
+composable activities, we use
+the Composable Activities benchmark dataset from \cite{Lillo2014}.
+This dataset consists of 694 RGB-D
+videos that contain activities in 16 classes performed by 14 actors. Each
+RGB-D sequence is captured using a Microsoft Kinect sensor, with the
+position of relevant body joints estimated using \cite{Microsoft2012}.
+Each activity in this dataset is spatio-temporally
+composed by a variable number of mid-level (atomic) actions. The total number of
+actions in the videos is 25 (plus an \emph{idle} action), while the number of actions
+that compose each particular activity fluctuates between 2 to 10 actions.
+For instance, the activity \emph{Walking while waving hand} has a spatio-temporal
+composition of 2 single actions: \emph{walking} and \emph{waving hand};
+while the activity \emph{Composed activity 4} is composed of 10 single actions:
+ \emph{walking}, \emph{calling with hands}, \emph{waving hand},
+\emph{talking on cellphone}, \emph{picking from floor}, \emph{throwing an object},
+\emph{putting an object}, \emph{picking cellphone from pocket}, and \emph{putting
+cellphone into pocket}, see Fig. \ref{fig:frontfigure} for some examples.
+Every actor performs each activity 3 times in average.
+Fig. \ref{fig_activities_actions_table} summarizes the composition of actions for
+each activity.
+The RGB-D data and annotations for this dataset are publicly available on
+our project webpage\footnote{\url{http://web.ing.puc.cl/~ialillo/sparse_hier_activities}}.
+%
+\begin{figure}[tb]
+\begin{center}
+\includegraphics[width=0.999\linewidth]{./fig_activities_actions_table.pdf}
+\end{center}
+\caption{Composition of actions (columns) into activities (rows). Note that some activities are simpler, composed only by two actions, while others are very complex, including up to ten different atomic actions per video. Activities also share an \emph{idle} action, not shown in the table.}
+\label{fig_activities_actions_table}
+\end{figure}
+%
+
+Recognition rates for the Composable Activities Dataset are summarized in Table
+\ref{Table-UniNorte}. 
+We report performance averaged over multiple runs
+using a leave-one-subject-out cross-validation strategy.
+We use a validation set to experimentally adjust the value of all the main
+parameters.
+In practice, we set $\lambda_1 = 100$ and $\lambda_2 = 20$.
+We set $K=50$ pose dictionary entries per body region when using the quadratic
+regularizer (QR), and $K=150$ per body region when using the sparse
+regularizer (SR).
+We also reduce the temporal resolution for faster processing by
+a factor of 6,
+so the effective frame rate for all videos in training and recognition is 5 fps.
+
+\begin{table}
+\centering
+{\small
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Algorithm} & \textbf{GEO} &  \textbf{GEO/MOV}  \\
+\hline
+Ours, SR+NI& $-$  &  \textbf{92.2\%} \\
+Ours, QR+NI& $-$  & 91.8\%  \\
+Ours, SR& 84.9\%  & 90.6\%  \\
+Ours, QR& 85.7\%  & 90.9\%   \\
+\hline
+BoW& 67.2\% & 74.1\%    \\
+HMM& 76.5\% & 78.9\%  \\
+H-BoW& 74.2\% & 82.4\%   \\
+2-lev-HIER& 79.6\% & 83.8\%  \\
+\hline
+LG \cite{vemulapalli2014human} & 74.7\% & $-$  \\
+\hline
+\end{tabular}
+}
+\normalsize
+\caption{Recognition accuracy of our method compared to several baselines (see text in Section
+\ref{subsec:exp_setup}). It is noteworthy that our 3-level model outperforms all 2-levels models. 
+Also, as seen in the accuracy for our model, including motion cues in the descriptor (GEO/MOV) and 
+using non-informative poses handling (NI) improve the accuracy over our previous model. The best 
+performance is obtained when using all the contributions described in this work.
+%\JC{JC: Convertir la ultima columna a dos filas: QR + NI, SR + NI}}
+}
+\label{Table-UniNorte}
+%\vspace{-0.4cm}
+\end{table}
+
+The confusion matrix obtained with our full model is reported in
+Fig.~\ref{fig:confusion_activities}. Note that for some activities the
+prediction is perfect, while for others there is high confusion between
+some activities, indicating probably highly similar poses like
+\emph{calling with hands} and \emph{waving hand}, where many actors
+perform the \emph{calling with hands} action with only one arm.
+
+\begin{figure}[tb]
+\begin{center}
+\includegraphics[width=0.999\linewidth]{./conf_matrix.pdf}
+\end{center}
+   \caption{Confusion matrix for the activity classification task in the Composable Activities 
+dataset, using sparse regularization, a fused descriptor and NI handling.}
+\label{fig:confusion_activities}
+\end{figure}
+
+To show the semantic interpretation of the poses learned by our model, Fig. 
+\ref{fig:example_poses_by_activity} shows top-scoring frames for three activities executed by 
+different 
+subjects. In general, our model produces highly interpretable poses that are 
+associated to characteristic body configurations of the underlying atomic actions. To further 
+illustrate this observation, Fig. \ref{fig:poses} shows the highest activations for eight pose 
+dictionary entries associated to the body region corresponding to the left arm. In each case, 
+Fig. \ref{fig:poses} also indicates the atomic action that assigns a greatest relevance (weight) to 
+the corresponding pose. 
+%\JC{Alvaro: No entiendo bien la ultima frase. Ademas, uno de los revisores pidio mostrar figuras de las poses aprendidas por el metodo. Podemos unir con esto?. Quizas mostrando con algun color el area de la pose identificada. O ejemplos caracteristicos de las poses, como en el paper de Bourdev and Malik sobre poselets (ECCV, 2012).}
+
+\begin{figure}[tb]
+\begin{center}
+\includegraphics[width=0.999\linewidth]{./fig_examples_poses_by_activity.pdf}
+\end{center}
+   \caption{Examples of top score frames for three activities. Note the high correlation between the actions that compose each activity and the pose of the actors.}
+\label{fig:example_poses_by_activity}
+\end{figure}
+
+
+\begin{figure}[tb]
+\begin{center}
+\includegraphics[width=0.999\linewidth]{./fig_poses.pdf}
+\end{center}
+   \caption{Examples of top scored poses for the body 
+region corresponding to the left arm. Also shown, it is the label of the action with 
+the highest classifier weight associated to the pose. In this case the model is trained using SR 
+and $K=150$ for 
+each body region.}
+\label{fig:poses}
+\end{figure}
+
+As shown in Table \ref{Table-UniNorte}, we place our recognition results in context by comparing 
+them to the performance of
+two baselines methods, two simplified versions of our model, and a state-of-the-art algorithm.
+The first baseline is based on a bag of words framework
+(BoW), which only captures very coarse per-region
+pose orderings and uses an independently pre-trained pose dictionary. Specifically, 
+this baseline uses $k$-means to quantize pose descriptors
+for each body region independently, which are aggregated into
+a temporal pyramid histogram representation.
+This is then fed into a multi-class linear SVM
+for directly mapping from video descriptors to activities. 
+The accuracy of this
+baseline is 74.1\% when using the combined
+descriptor based on geometric and motion information.
+
+As a second baseline, we implement a Hidden Markov Model (HMM).
+The HMM model can directly encode pose and action transitions built
+upon an independently pre-trained pose dictionary.
+In our implementation, states are trained with supervision by assigning one
+state to each atomic action. Quantized poses are the observed variables.
+We train models independently for each class, and at testing time,
+we classify new sequences by assigning the label that corresponds to the
+highest scoring model. The accuracy of this
+baseline is 78.9\% when using the combined
+descriptor based on geometric and motion information. While the ordering encoded by the HMM model 
+helps to improve accuracy over BoW,
+it still lacks the discriminative power of the top layer in our model for
+jointly learning model parameters for all classes. 
+
+
+We also compare performance against two simplified versions of our hierarchical
+model. The first simplified version (H-BoW) does not jointly
+learn the pose dictionary, but uses a fixed pose quantization obtained with
+$k$-means, and omits the transition terms.
+Unlike our full model, this simplified version does not take advantage of
+jointly learning the pose dictionary, which leads to sub-optimal
+pose encoding at the lower level of the hierarchy.
+Also, by omitting the transition terms, the model cannot capture patterns
+in the evolution of actions and poses.
+These simplifications lead to a 10\% drop in performance in comparison
+to our full model.
+
+As a second simplification of our full model, we construct a
+hierarchical model (2-lev-HIER) with two jointly learned
+layers that encode poses and atomic actions. Activity recognition
+is performed by an independently trained linear
+classifier on top of the inferred atomic actions.
+In this case, the performance of this model simplification is 8.4\% lower
+than our full model. It is interesting that even when seemingly the top two
+levels are uncoupled and one could train them independently,
+there are benefits in jointly learning them.
+%The action prediction in our 3-level hierarchical model is highly
+%connected to the activity that is imputed during classification
+%(recall that for classification we exhaustively search for each activity which
+%produces the highest scored sequence of actions and poses, as
+%Equation (\ref{eq:classify_inference})).
+%Finally, jointly learning the pose dictionary is also beneficial, 
+%as we gain about 3\% in accuracy when compared to
+%using a pre-trained pose dictionary.
+
+
+We also compare against an existing state-of-the-art algorithm from
+the literature. In this case, we compare to the
+method recently described in \cite{vemulapalli2014human} (LG).
+%Another simple model is LG \cite{vemulapalli2014human},
+We select this algorithm because it achieves state-of-art
+performance on several pose-based action datasets. We train this model to
+directly predict the activities from poses, omitting the mid-level
+annotations, as in the BoW baseline. While the accuracy of LG is above BoW, it is
+still 11\% lower than our model that only uses geometric information (GEO).
+
+%\JC{General comments}:
+%
+%It is worth to note that all baselines that omit the mid-level
+%(atomic actions) annotations (BoW and LG) perform worse that the the others
+%that use that information.
+%
+%Our results confirm that jointly learning the
+%classifiers in three levels (activities, actions and poses) outperform simpler
+%setups by around 10\% of accuracy.

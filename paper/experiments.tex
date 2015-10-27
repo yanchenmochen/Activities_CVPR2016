@@ -1,0 +1,91 @@
+We validate the effectiveness of our proposed model by considering two experimental scenarios.
+First, we test the ability of our approach to discriminate simple actions on a
+benchmark dataset.
+Second, we test the performance of our model to recognize complex and
+composable human activities. Additionally, we also study the contribution of key components of our 
+model
+and their impact in recognition performance.
+In particular, we highlight the contribution of the extensions of our
+framework with respect to its preliminary version in \cite{Lillo2014}.
+
+\begin{comment}
+\subsection{Recognition of simple actions}
+\label{subsec:exp_setup}
+\input{experiments_simple}
+% Here we explain the databases, give implementation details, and all the extra info needed to understand the following sections.
+
+\subsection{Recognition of composable activities}
+\label{subsec:experiments_summary}
+\input{experiments_composable}
+
+\subsection{Impact of motion descriptor}
+\label{subsec:exp_motion_descriptor}
+\input{experiments_motion}
+
+\subsection{Impact of handling non-informative poses}
+\label{subsec:exp_non_info_handling}
+\input{experiments_non_info_handling}
+
+\subsection{Impact of sparse regularizer}
+\label{subsec:sparse_reg}
+\input{experiments_sparse_reg}
+
+\input{experiments_detailed_CA}
+
+\end{comment}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%555
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% COMMENTED SECTION FOR CAD120, INCLUDE IT SOMEWHERE IF THERE IS RESULTS IN
+% THIS DATASET
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{comment}
+\subsection{CAD120 Dataset}
+The CAD120 dataset is introduced in \cite{Koppula2012}. It is composed of 124
+videos that contain activities in 10 clases performed by 4 actors. Activities
+are related to daily living: \emph{making cereal}, \emph{stacking objects}, or
+\emph{taking a meal}. Each activity is composed of simpler actions like
+\emph{reaching}, \emph{moving}, or \emph{eating}. In this database, human-object
+interactions are an important cue to identify the actions, so object
+locations and object affordances are provided as annotations. Performance
+evaluation is made through leave-one-subject-out cross-validation. Given
+that our method does not consider objects, we use only
+the data corresponding to 3D joints of the skeletons. As shown in Table
+\ref{Table-CAD120},
+our method outperforms the results reported in
+\cite{Koppula2012} using the same experimental setup. It is clear that using
+only 3D joints is not enough to characterize each action or activity in this
+dataset. As part of our future work, we expect that adding information related
+to objects will further improve accuracy.
+%
+\begin{table}
+\centering
+{\small
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Algorithm} & \textbf{Average precision} & \textbf{Average recall}\\
+\hline
+Our method &  32.6\% & 34.58\% \\
+\hline
+\cite{Koppula2012} &   27.4\% & 31.2\%\\
+\cite{Sung2012} &  23.7\%  &  23.7\% \\
+\hline
+\end{tabular}
+}
+\caption{Recognition accuracy of our method compared to state-of-the-art methods
+using CAD120 dataset.}
+\label{Table-CAD120}
+\end{table}
+\end{comment}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+

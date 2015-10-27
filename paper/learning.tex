@@ -1,0 +1,330 @@
+%%%***************************LEARNING************************************%%%
+In the following, we provide the details of the algorithm for learning the
+parameters of the hierarchical model proposed in this paper.
+%Recall that we formulate learning as the optimization problem in
+%Equation \ref{eq:big_problem2_1_slack}.
+
+\section{Learning algorithm using dual formulation for SR setup} \label{subsec:learning}
+To present the details of the algorithm we first assume $R=1$ for simplicity. Solving the model implies two steps: first, to find the best pose labeling $Z_i$ that explain the atomic actions and activities given the classifiers as Equation (\ref{eq:find_Z}); and then solve the problem in Equation (\ref{eq:big_problem2_1_slack}) to find the optimal linear classifiers that minimize the classification error in the training set. This involves solving an iterative optimization problem (see Algorithm \ref{alg:learning}), where in each iteration the most violated constraint must be found, and then this constraint must be introduced into a working set of $J$ constraints to solve a reduced SSVM problem. In this section we give details about inferring the best poses $Z^*$ given the parameters $W$, and then how to find optimal parameters $W$ solving a dual optimization problem.
+
+An important step in our learning algorithm is the initialization of $Z$,
+which holds the assignment of observed poses to dictionary entries.
+In practice, we initialize $Z$ by clustering the pose descriptors for each
+region independently using $k$-means and setting it equal
+to the cluster memberships. 
+
+%
+\paragraph{\textbf{Inferring latent poses $Z.$}}
+%
+The assignment $Z_i^* | W$ is calculated
+%separately for each region (given $V_i$)
+using dynamic programming. Omitting the sequence index $i$ and the explicit dependency of $W$,
+%for each region $r$
+we find $Z^*$ by solving Equation (\ref{eq:find_Z}).
+We can disregard the terms not dependent on $Z$, which yields the follwing
+optimization objective:
+\begin{equation}
+\label{eq:update_z}
+\begin{split}
+  Z^* = \argmax_{Z=(z_1,\dots,z_T)} \sum_{t=1}^T & \left[ \beta_{v_{t},z_t} +  {w_{z_t}}^\top x_{t}\delta(z_t \le K)   \right. \\ &  \left.+ \vphantom{{w_{z_t}}^\top} \theta \delta(z_t = K+1) + \eta_{z_{t-1},z_t} \right]
+\end{split}
+\end{equation}
+We split the sum in Equation (\ref{eq:update_z}) in terms of pairwise relations, and optimize it using a backward recursion starting from $t=T$, defining $f_{T+1}(z_{T+1}) = 0$: 
+%\JC{Aqui se resuelve primero para t=T, y luego se va regresando hasta t=1?}
+\begin{equation}
+f_t(z_t) = \max_{z_{t+1} \in \{1,\dots,K\}} g(z_t,z_{t+1}) + f_{t+1}(z_{t+1})
+\end{equation}
+for all $z_t = 1,\dots,K+1$, where $g(z_t,z_{t+1})$ defines the \emph{benefit} of choosing the
+assignment $z_{t}$ given the assignment in the next frame $z_{t+1}$.
+The benefit is given by
+\begin{equation}
+\begin{split}
+g(z_t,z_{t+1}) = &\beta_{v_{t+1},z_{t+1}} +  {w_{z_{t+1}}}^\top x_{t+1}\delta(x_t \le K) \\ &+ \theta \delta(z_t = K+1) + \eta_{z_t,z_{t+1}} .
+\end{split}
+\end{equation}
+Using dynamic programming, we find the optimal sequence $Z^*$ in $\mathcal{O}(RT(K+1)^2)$ operations.
+Note than a greedy approximation has a complexity $\mathcal{O}(RT(K+1))$, the same complexity of our model if temporal transition terms are omitted.  
+%However, the greedy approach does not solve adequately the pose assignments for the complete sequence.
+%\JC{JC, no es claro: 
+Despite the increased complexity, we observe in our experiments the benefits of modeling temporal transitions of predicted actions and poses,  boosting the accuracy of our model. Moreover, opposed to a model like BoW, where the labels are inferred using only local information (in videos, local refers to both time and space), in our model the pose labels are inferred by adding three different contexts: the geometry of the pose given by the pose descriptor (local context), the atomic action being executed (hierarchical context), and the pose and action transitions (temporal context).
+
+%
+\paragraph{\textbf{Finding the optimal parameters $W$.}}
+%
+Once the optimal pose assigments $Z_i$ are computed, we can solve the optimization problem in Equation (\ref{eq:big_problem2_1_slack}).
+% that we reproduce here:
+%\begin{align}
+%\label{eq:big_problem2_1_slack_2}
+%\small
+%\begin{split}
+%& \min_{W, \xi}
+%      \Omega(W)
+% + C\xi \\
+%& \text{subject to:} \\ 
+%& ~~ \frac{1}{M}\sum_{i=1}^M W^\top(\psi_i(X_i, Z_i, V_i, y_i) - \psi_i(X_i, Z, V, y))
+%      \geq  \frac{1}{M}\sum_{i=1}^M\Delta_i( y, V) - \xi \\
+%  &\quad \quad \forall y \in \mathcal{Y}, Z \in \mathcal{Z},
+%      V \in \mathcal{V}, \xi \ge 0 .
+%\end{split}
+%\normalsize
+%\end{align}
+%As we mentioned earlier.
+The large number of constraints is handled by using the cutting-plane algorithm.
+% to deal with the huge number of constraints.
+Every step of the cutting-plane algorithm involves finding the most violated constraint for every instance $i$ of the training set. \JC{Then, the linear constraints are averaged}, and the result is added to the working set of constraints for solving the reduced optimization.
+%
+Finding the most violated constraint is given by:
+\begin{align}
+\label{fmvc}
+(\hat{y}_i,\hat{V}_i,\hat{Z}_i) &=\argmax_{y, V, Z} \quad \Delta_i( y, V) + W^\top \psi_i(X_i,Z,V,y)
+\end{align}
+Note that the regularizer $\Omega(\cdot)$ does not play any role in solving Equation (\ref{fmvc}). We can optimize this by exhaustively enumerating all values of $y$, and solving
+the following for every training instance $i$ given $y$:
+%in every region $r$:
+%
+\begin{equation}
+\label{eq:find_most_violated2}
+\begin{split}
+ \hat{V}, \hat{Z} | y ~ =~ &   \argmax_{V,Z} ~   \sum_{t=1}^T \left( \vphantom{ \frac{\lambda_2}{RT}} \alpha_{y,v_{t}} 
+                  + \beta_{v_{t},z_{t}} \right. \\
+			& \quad\quad \left. + {w_{z_{t}}}^\top x_{t} \delta(z_t \le K) + \theta \delta(z_t = K+1) \right. \\ 
+				& \quad\quad \left. + \gamma_{v_{{t-1}},v_t} + \eta_{z_{{t-1}},z_t}  + \frac{\lambda_2}{RT}\delta(v_{t} \neq v_{{(i)}_t}) \right)% \\
+%& \quad\quad +  \frac{\lambda_3}{A} \sum_{a=1}^A \left(  \max\{0, J(a) - \lambda_4 \}\right)^2.
+\end{split}
+\end{equation}
+%
+We can solve the maximization of Equation (\ref{eq:find_most_violated2}) 
+%in every region 
+ using dynamic programming. We split the sum in Equation (\ref{eq:find_most_violated2}) in terms of pairwise relations, and optimize it using a backward recursion:
+%
+\begin{equation}
+\label{dp_recursion}
+F_t(v_t,z_t) = \max_{\begin{split} \text{\scriptsize $v_{t+1} \in \{1,\dots,A\}$\normalsize} \\ \text{\scriptsize $z_{t+1} \in \{1,\dots,K\}$\normalsize} \end{split} } \begin{split} \Bigl\{  G((v_t,z_t),(v_{t+1},z_{t+1})) + \\ F_{t+1}(v_{t+1},z_{t+1})  \Bigr\} \end{split}
+\end{equation}
+for all $v_t = 1,\dots,A$ and $z_t = 1,\dots,K$. $G$ defines the \emph{benefit} of choosing action $v_t$ and pose assignment $z_{t}$ given the atomic action and pose assignment in the next frame ${t+1}$. %For each region $r$, 
+$G$ is given by
+\begin{equation}
+\begin{split}
+G((v_t,z_t),(v_{t+1},z_{t+1})) & = G_s((v_t,z_t),(v_{t+1},z_{t+1})) \\ & \quad\quad + G_n(v_{t+1},z_{t+1}),
+\end{split}
+\end{equation}
+\textforreview{
+where we split $G$ into a sequential term $G_s$ and a non-sequential term $G_n$.
+In turn, these are given by:  
+\begin{equation}
+\label{G_seq}
+G_s((v_t,z_t),(v_{t+1},z_{t+1})) =\gamma_{v_{t},v_{t+1}}+ \eta_{z_{t},z_{t+1}} %+ \frac{\lambda_3}{A} c(v_{t+1},z_{t+1})
+\end{equation}
+\begin{equation}
+\label{G_non_seq}
+\begin{split}
+G_n(v_{t+1},z_{t+1}) & = \alpha_{y,v_{t+1}} 
+                  + \beta_{v_{t+1},z_{t+1}} + \\
+		& \quad\quad {w_{z_{t+1}}}^\top x_{t+1} \delta(z_{t+1} \le K) + \theta \delta(z_{t+1}=K) \\ & \quad\quad  + \frac{\lambda_2}{RT}\delta(v_{t+1} \neq v_{{(i)}_{t+1}}).
+\end{split}
+\end{equation}
+%$ c(v_{t+1},z_{t+1})$ is defined as the penalty change when a new learned pose (recalling, a pose which label is lesser or equal than $K$) is found in the sequence $t'\ge t+1$ labeled with the atomic action defined by the label $v_{t+1}$. 
+%Defining as $J_{t'}^T(a)$ the diversity of learned poses from frame $t'$ to $T$ evaluated for atomic action $a$, the term $ c(v_{t+1},z_{t+1})$ is stated as:
+%\begin{equation}
+%c(v_{t+1},z_{t+1}) = 2q-1\text{ for } q = \max (0,J_{t+2}^T(v_{t+1}) - \lambda_4)
+%\end{equation}
+%
+%This last equation emerges when using the penalty term related with pose diversity in a sequential way.
+}
+
+Using dynamic programming, we find the optimal sequence $\hat{V}_y$ and $\hat{Z}_y$ for all regions in $\mathcal{O}(LRTA^2(K+1)^2)$ operations, with $L$ being the number of activities in the dataset.
+%, whereas the greedy approach is $\mathcal{O}(TA(K+1))$. The use of dynamic programming instead of a greedy approach is crucial, since with the latter we only find an approximation of the best sequence of poses and atomic actions, having in general an early convergence to suboptimal classifiers that can't reproduce the correct action labeling: while in learning we could get all constraints satisfied (because $V_i$ is given), some sequences could be wrongly classified when the same training data is tested. 
+%
+This complexity, proportional to $(AK)^2$, can be prohibitive with large datasets, and several approximations are possible for speeding up
+the computation.
+In practice, we find a near-optimal labeling using a small subgroup of $(a,k)$ for every frame.
+We determine such subgroup by selecting the top $P \ll AK$ scored frames from the non-sequential
+terms using Equation (\ref{G_non_seq}). This changes the complexity of the dynamic programming
+to $P^2$.
+If we use the 10\% best tuples $(a,k)$ for every frame, the computing time is reduced by a
+factor of 100, but the approximation keeps 99.95\% of the global optimum labeling.
+%he frames with the same label as computed with the complete dynamic
+%programming problem.
+Further speedups can be achieved by first using only 2\% of the best $(a,k)$
+combinations until convergence, then 5\%, and finally 10\%. Using this optimization with a constant $P$, the inference computing time is approximately linear in terms of $T$, since the same $P$ can be used with different values of $A$ and $K$. As $L$, $R$ and $P$ become constants for all videos, the final complexity mostly depends linearly on $T$.
+
+Recalling the 1-\emph{slack} formulation of Equation (\ref{eq:big_problem2_1_slack}), a single constraint is formed by finding the most violated constraint of each video $i$ and then compute the average vector of $\psi$ and the average loss over all videos:
+\begin{align}
+\bar\psi & =  \frac{1}{M}\sum_{i=1}^M \psi_i(X_i,Z_i,V_i,y_i) - \psi_i(X_i,\hat Z_i, \hat V_i, \hat y_i) \\
+\bar\Delta & = \frac{1}{M}\sum_{i=1}^M \Delta((y_i,V_i),(\hat y_i, \hat V_i))
+\end{align}  
+%
+In each cutting-plane iteration, a new constraint is introduced into the working set of constraints.
+%totalizing $J$ constraints.
+With a working set of $J$ constraints, and the regularizer (\ref{eq:general_regularizer}), our optimization for $W$ can be stated as:
+\begin{align}
+\label{eq:PrimalSparse}
+\begin{split}
+\min_{W_{-\beta},\beta,\xi}  \frac{1}{2} ||\+W_{-\beta}||_2^2   + \frac{\mu}{2}||\+\beta & ||_2^2 + \rho ||\+\beta||_1 + C\xi \\
+\text{subject to:}\hspace{2cm}\\
+ \quad\quad\begin{bmatrix} -W^\top & -\xi \end{bmatrix}  \begin{bmatrix} \bar{\psi}_j \\ 1 \end{bmatrix} + \bar{\Delta}_j  & \le 0, j \in \{1,\dots,J\} \\
+%-\beta_{r,a,k}  &\le 0 \\
+ %-\alpha_{r,c,a}  &\le 0 \\
+ -\xi &\le 0.
+\end{split}
+\end{align}
+%
+Note that when $\rho > 0$, the objective function of the problem in (\ref{eq:PrimalSparse})
+is not differentiable with respect to $\beta_u = 0$, $u=\{1,\dots,RAK\}$. Also, since the number of dimensions of $W$ is relatively high, and we add a new constraint in each cutting-plane iteration, the cost of solving in its primal form is high.
+%specially when the number of constraints exceeds a few hundreds.
+This motivates the derivation of the dual form of this optimization problem.
+
+%\paragraph{\textbf{Solving the model.}}
+%We now derive the dual of the problem in (\ref{eq:PrimalSparse}).
+Recall, from convex optimization theory, that the dual formulation for the problem
+\begin{equation}
+\begin{split}
+&\min_{x \in \text{dom$f$}} f(x) \quad  \text{subject to} \quad Qx-b \le 0,
+\end{split}
+\end{equation}
+is given by
+\begin{equation}
+\begin{split}
+\label{eq:general_dual}
+&\max_{\phi \in \text{dom$f^*$}} -f^*(-Q^\top \phi) - b^\top\phi \quad \text{subject to} \quad \phi \ge 0.
+\end{split}
+\end{equation}
+In the dual, $f^*$ is the \emph{convex conjugate} function of $f$, given by $f^*(y) = \sup_{x \in \text{dom$f$}}\{y^\top x-f(x)\}$. The convex conjugate function is well defined only when it is bounded, and one of its the nice properties is that the convex conjugate function of independent variables is the sum of the individual convex conjugate functions. With this in mind, we can formulate the dual of the problem in (\ref{eq:PrimalSparse}) using Equation (\ref{eq:general_dual}) applying it independently for $W_{-\beta}$, $\beta$ and $\xi$. First, we reformulate the constraints from (\ref{eq:PrimalSparse}) in matrix form:
+\begin{equation}
+\label{eq:const_matrix}
+- \mathbf{Q}\begin{bmatrix} W \\ \xi \end{bmatrix} - \mathbf{b} \le 0,
+\end{equation}
+where
+\begin{equation}
+\begin{split}
+\mathbf{Q} = \begin{bmatrix}  \bar\Psi_\alpha^\top & \bar\Psi_\beta^\top  &   \bar\Psi_w^\top  & \bar\Psi_\gamma^\top & \bar\Psi_\eta^\top &  \bar\Psi_\theta^\top & 1  \end{bmatrix} \text{   and   }
+\end{split}
+\begin{split}
+\mathbf{b}= \begin{bmatrix} -\bar \Delta_1 \\ \vdots \\ -\bar \Delta_J \end{bmatrix}.
+\end{split}
+\end{equation}
+$\bar \Psi$ is the matrix of the stacked $\bar\psi_j,~j=\{1,\dots,J\}$, one column per constraint, and the subscript refers to the portion of indexes of the  corresponding linear classifier.
+
+Now, we can find the convex conjugate functions for $W_{-\beta}$, $\beta$ and $\xi$:
+
+\paragraph{Convex conjugate function for $f(x) = \frac{1}{2}||x||_2^2$.}
+It is easy to show that if $f(x) = \frac{1}{2}||x||_2^2$, then $f^*(y) = \frac{1}{2}||y||_2^2$.
+\paragraph{Convex conjugate function for $f(x) = \frac{\mu}{2}||x||_2^2 + \rho||x||_1$.}
+From the definition of the complex conjugate function, we have 
+\begin{equation}
+f^*(y) = \sup_{x \in \text{dom$f$}}\{y^\top x-\frac{\mu}{2}||x||_2^2 - \rho||x||_1\} .
+\end{equation}
+As we are adding independent variables, we can formulate the convex conjugate function as
+\begin{equation}
+\begin{split}
+f^*(y) & = \sum_{i=1}^M f_i^*(y_i) \\
+& = \sum_{i=1}^M \sup_{x_i \in \text{dom$f_i$}}\{y_ix_i - \mu x_i^2 - \rho |x_i|\}.
+\end{split}
+\end{equation}
+With some manipulations, and assuming $\mu > 0$ and $\rho \ge 0$,  we have
+\begin{equation}
+ f_i^*(y_i) = \begin{cases} 0 & \mbox{for } |y_i| <  \rho \\ \frac{1}{2\mu}(|y_i| - \rho)^2 & \mbox{for }|y_i| \ge  \rho \end{cases} .
+\end{equation}
+Then, adding the independent variables $x_i$, we have
+\begin{equation}
+f^*(y) = \frac{1}{2\mu} \sum_{i=1}^M \left[\max (0,~|y_i|-\rho)\right]^2.
+\end{equation}
+\paragraph{Convex conjugate function for $f(x) = Cx$.}
+\begin{equation}
+f(x) = Cx \Rightarrow f^*(y) = 0 \mbox{ only for } y=C
+\end{equation}
+Using the matrix form of the constraints as in Equation (\ref{eq:const_matrix}), the dual problem can now be stated as:
+% (considering $\phi$ as the dual variables)
+\begin{equation}
+\begin{split}
+&\min_{\phi} f^*(\mathbf{Q}^\top \phi) + \tilde{\mathbf{b}}^\top \phi\\
+&\mbox{subject to } \quad \phi_i \ge 0.
+\end{split}
+\end{equation}
+Finally, the dual problem becomes
+\begin{equation}
+\begin{split}
+& \min_{\phi} ~\frac{1}{2}||\bar\Psi_{W_{-\beta}} \phi||_2^2 + \frac{1}{2\mu}\sum_{r,a,k}[\max(0,|\bar\Psi_{\beta_{r,a,k}} \phi| - \rho)]^2 \\ & \hspace{2cm}+ \mathbf{b}^\top \phi \\
+& \mbox{subject to} \\
+&\quad\quad \sum_{j=1}^J \phi_{j} \leq C,\quad \phi_{j} \ge 0 ~~\forall~ j \in \{1,\dots,J\}.
+\end{split}
+\end{equation}
+The linear constraint $\sum_{i=0}^M \phi_{c_i} \leq C$ is produced by the linear term in the primal formulation, $C\xi$. Recall that $f^*(y) = 0$ only for $y = C$; in this case, $y = \sum_{i=1}^M \phi_{c_i} + \phi_{\xi} = C$. As $\phi_{\xi}$ must be always greater or equal to zero, it is enough to consider the constraint $\sum_{i=0}^M \phi_{c_i} \leq C$ and eliminate $\phi_{\xi}$ of the problem. 
+
+At this point there are some facts that are worth to highlight.
+First, for $\rho=0$ and $\mu = 1$, we recover the original quadratic formulation (as a standard SSVM) in the dual problem.
+%\JC{
+Second, for $\mu = 0$ and $\rho > 0$, the formulation is analog to use a $L_1$ regularizer in $\beta$. In this case, we would need to use optimization methods different than a gradient-based method, justifying our choice of using a mixture of $L_1$ and $L_2$ regularizer in $\beta$ terms.
+And finally, the gradient of the objective function is continuous, as opposed to the gradient of the objective function of the primal problem, and is given by
+\begin{equation}
+\label{eq:dual}
+\small
+\begin{split}
+\frac{\partial g(\phi) }{\partial \phi} = \bar\Psi_{W_{-\beta}}^\top \bar\Psi_{W_{-\beta}} \phi + \frac{1}{\mu}\sum_{r,a,k}\max(0,|\bar\Psi_{\beta_{r,a,k}} \phi|-\rho)\bar\Psi_{\beta_{r,a,k}} ^\top \bar\Psi_{\beta_{r,a,k}} \phi + \mathbf{b}.
+\end{split}
+\normalsize
+\end{equation}
+The main advantage of a continuous gradient in the objective function is that we can use any gradient-based solver for Equation (\ref{eq:dual}), as opposed to the problem formulated using only $L_1$ norm. By using a combination of $L_2$ and $L_1$ norms in the dual formulation, the objective function is differentiable, as opposed to the primal formulation; there is no extra constraints compared to using only $L_1$ norm; and finally, the primal variables (i.e. linear classifiers) are recovered from the dual variables in a closed form.
+
+To recover the primal variables from dual variables, we use the optimal $x^*$ for $f^*(y)$. For quadratic terms ($L_2$ norm), we have $x^* = y = -Q^\top\phi$, so we have \mbox{$\+\alpha = \bar\Psi_\alpha\phi$}, \mbox{$\+w = \bar\Psi_w \phi$}, \mbox{$\+\gamma = \bar\Psi_\gamma \phi$},  \mbox{$\+\eta = \bar\Psi_\eta \phi$} and \mbox{$\+\theta= \bar\Psi_\theta \phi$}.
+For $\+\beta$, we have the equation \mbox{$y -\mu x^* - \rho \frac{x^*}{|x^*|} = 0$} for $|y| \ge \rho$, and $x^*=0$ otherwise. Noting that $x^*$ and $y$ must have the same sign, we solve  $\+\beta$ as
+\begin{equation}
+\label{eq:beta_recovery}
+\+\beta_i=\begin{cases} 0 & \mbox{if } |\bar\Psi_{\beta_i} \phi| < \rho  \\ \frac{\bar\Psi_{\beta_i} \phi}{\mu[1 + \frac{\rho}{|\bar\Psi_{\beta_i}\phi|-\rho}]} &  \mbox{if } |\bar\Psi_{\beta_i}\phi| \ge \rho  \end{cases}.
+\end{equation}
+From Equation (\ref{eq:beta_recovery}), we can clearly see the effect of $\rho$: the bigger its value, the more coefficients of $\beta$ will be zero.
+Using a small value for $\mu$ and a relatively high value of $\rho$ produce the coefficients of $\beta$ to be sparse, making an efficient use of poses compared to using only a quadratic regularizer.
+
+With some minor changes, we can include non-negativity constraints for the primal variables in the dual formulation. Specifically, we use non-negativity constraints in the classifiers $\alpha$ and $\beta$, with the objective that the sparse coefficients generated resemble a generative approach. Each non-negative variable adds a new dual variable, so we will have new dual variables $\phi_\alpha$ and $\phi_\beta$. In practice, only the dual variables associated to constraints are computed, as $\phi_\alpha$ and $\phi_\beta$ can be computed in closed form, as they try to make the associated original weight to zero, so $\phi_\alpha = \max(0,-\bar\Psi_\alpha \phi_c)$ and $\phi_\beta = \max(0,-\bar\Psi_\beta \phi_c)$, with $\phi_c$ the dual variables associated to the working set of constraints.  
+
+
+
+%(PERHAPS THE NEXT TWO PARAGRAPHS SHOULD BE MOVED TO LEARNING SECTION)
+\begin{comment}
+\paragraph{\textbf{Speeding up inference.}}
+During our learning algorithm, a crucial step is to find the most violated constraint.
+A similar search also appears in the inference process for new testing videos.
+Both cases can be solved with a dynamic programming formulation whose complexity is proportional to $(AK)^2$.
+Such complexity can be prohibitive with large datasets and several approximations are possible for speeding up
+the computation.
+In practice, we find a near-optimal labeling using a small subgroup of $(a,k)$ for every frame.
+We determine such subgroup by selecting the top $P < AK$ scored frames from the non-sequential
+terms using Equation (\ref{G_non_seq}). This changes the complexity of the dynamic programming
+to $P^2$.
+If we use the 10\% best tuples $(a,k)$ for every frame, the computing time is reduced by a
+factor of 100, but the approximation keeps 99.95\% of the global optimum labeling.
+%he frames with the same label as computed with the complete dynamic
+%programming problem.
+Further speed ups can be achieved by first using only 2\% of the best $(a,k)$
+combinations until convergence, then 5\%, and finally 10\%.
+%Using these optimizations,
+%our model training can be done in a few days.
+%Each body part is independently labeled in each frame with its corresponding
+%atomic action in training data.
+
+%As we mentioned earlier, we are interested in infering the correct activity
+%category of a video, and also the corresponding atomic actions performed. In
+%this sense, models that do not allow labeling of every single frame are useless
+%for atomic action prediction. Our model associates each part of each frame with
+%an action and pose. We can state our model as a multiclass classifier, so for
+%each part/frame we can get a score of the configuration, which contains
+%valuable fine-grained information.
+
+\paragraph{\textbf{Measuring pose influence on activities.}}
+Intuitively, the presence of certain poses can be a strong evidence for the execution of an activity.
+We measure the influence or importance of each pose in the dictionary for the recognition
+of each activity using the following metric.
+%Para comparar el nivel de especialización de las poses en las actividades, proponemos medir cuándo pondera
+%la aparición de las poses aprendidas en la clasificación de una actividad. Para esto, definimos la influencia
+%de la pose $k$ con la actividad $y$ como la suma de los coeficientes que ligan la pose $k$ con cada acción
+%atómica $a in\{1,\dots,A\}$, con cada coeficiente ponderado por el peso particular de cada acción en la respectiva actividad.
+For every region $r$, we define the influence of pose $k$ on activity $y$ as
+\begin{equation}
+\label{eq:influence}
+I^r(y,k) = \sum_{a=1}^A |\alpha^r_{y,a} \beta^r_{a,k}|
+\end{equation}
+In Eq. (\ref{eq:influence}), the marginalization over the set of valid actions makes explicit the fact
+that pose $k$ influences activity $y$ only through its compositional role to generate an action $a$.
+\end{comment}
+
+

@@ -1,0 +1,20 @@
+This paper presents an approach to recognize human activities using
+body poses estimated from RGB-D data.
+In particular, we focus on recognizing complex activities composed of
+sequential or simultaneous atomic actions and body motions of a
+single actor. We tackle this problem by introducing a hierarchical
+compositional model that operates at three levels of abstraction. At the lower
+level, motion and appearance descriptors are used to learn a dictionary of body poses. At
+the intermediate level, sparse compositions of body poses are used to
+represent atomic human actions. Finally, at the highest level, spatial and
+temporal compositions of atomic actions are assembled to represent complex
+human activities. We formulate learning as an energy
+minimization problem using a max-margin framework, where each body pose and
+atomic action is modeled by a linear classifier. Our results show the benefits of using a
+hierarchical model that exploits the sharing and composition of body poses into actions, and 
+actions into activities. In particular, the resulting model is able to identify the temporal span of 
+each atomic action as well as the body regions executing each action, so it
+has the appealing property to output mid-level semantic information in addition to 
+high level activity classification. A quantitative evaluation using two benchmark
+datasets illustrates the advantages of our model to perform %pose
+action and activity recognition.

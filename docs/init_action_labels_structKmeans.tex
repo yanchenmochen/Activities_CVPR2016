@@ -1,0 +1,108 @@
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage{times}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{fullpage}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{verbatim}
+
+% Include other packages here, before hyperref.
+
+% If you comment hyperref and then uncomment it, you should delete
+% egpaper.aux before re-running latex.  (Or just hit 'q' on the first latex
+% run, let it finish, and you should be clear).
+\usepackage[pagebackref=true,breaklinks=true,letterpaper=true,colorlinks,bookmarks=false]{hyperref}
+
+\DeclareRobustCommand\onedot{\futurelet\@let@token\@onedot}
+\def\@onedot{\ifx\@let@token.\else.\null\fi\xspace}
+\def\eg{\emph{e.g}\onedot} \def\Eg{\emph{E.g}\onedot}
+\def\ie{\emph{i.e}\onedot} \def\Ie{\emph{I.e}\onedot}
+\def\cf{\emph{c.f}\onedot} \def\Cf{\emph{C.f}\onedot}
+\def\etc{\emph{etc}\onedot} \def\vs{\emph{vs}\onedot}
+\def\wrt{w.r.t\onedot} \def\dof{d.o.f\onedot}
+\def\etal{\emph{et al}\onedot}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\newcommand{\+}[1]{\ensuremath{{\boldsymbol #1}}}
+
+
+% Pages are numbered in submission mode, and unnumbered in camera-ready
+\begin{document}
+
+%%%%%%%%% TITLE
+\title{Algorithm to initialize action labels for region-based actions using frame-level action annotations}
+
+%\author{Juan Carlos Niebles\\
+%Universidad del Norte\\
+%Institution1 address\\
+%{\tt\small njuan@uninorte.edu.co}
+% For a paper whose authors are all at the same institution,
+% omit the following lines up until the closing ``}''.
+% Additional authors and addresses can be added with ``\and'',
+% just like the second author.
+% To save space, use either the email address or home page, not both
+%}
+
+\maketitle
+%\thispagestyle{empty}
+
+\section{Problem}
+
+In $M$ videos, we have $Q_m$ temporal annotations of actions (action stamps) in each video, in the form of a time interval where the action is performed. The actions can overlap in time. We wish to split each frame into $R$ regions, and select a single action label for each region in each frame. As we do not know in advance which regions perform the actions, we plan to build a model to associate each action interval with one or more regions.
+
+The structure of the problem allow us to infer the following relations:
+\begin{itemize}
+\item Each action interval $q$ must appear at least one time in the video. The action label of the action interval $q$ is defined as $a_q$.
+\item Two overlapping action intervals can't appear in the same region.
+\item The maximum number of action intervals belonging to each region must be at last the number of non-overlapping actions in each video. This number is defined as $t_m$
+\item The maximum number of regions sharing the same action interval $q$ must be the difference between the total number of regions ($R$) and the number of time overlapping actions with $q$. This number is defined as $o_q^m$
+\end{itemize}
+We define $v_{r,q}^m=1$ when the action interval $q$ appears in region $r$ in the video $m$, and $v_{r,q}^m=0$ otherwise. We assume we have pose labels for each frame, independent for each region. For an action interval $q$, we use the histogram of pose labels for each region in the action interval, defined for the video $m$ as $h_{r,q}^m$ . We can solve the problem of finding the correspondence between action intervals and regions in a formulation similar to $k$-means, using the structure of the problem as constraints in the labels. 
+\begin{equation}
+\begin{split}
+P1) \quad \min J= &\sum_{m=1}^M  \sum_{r=1}^R \sum_{q=1}^{Q_m}  v_{r,q}^m || h_{r,q}^m - \mu_{a_q}^r||_2^2 -\frac{1}{\lambda} v_{r,q}^m\\ 
+ \text{s. to} 
+\quad 
+& 1 \le \sum_{r=1}^R v_{r,q}^m \le o_q^m \\ 
+& \sum_{q=1}^{Q_m} v_{r,q}^m \le t_m \\ 
+& v_{r,q_1}^m + v_{r,q_2}^m \le 1 \text{ if } q_1\cap q_2 \neq \emptyset \\  
+& v_{r,q}^m \in \{0,1\},~\forall m
+\end{split}
+\end{equation}
+ 
+$\mu_{a_q}^r$ are computed as the mean of the descriptors with the same action label within the same region, and $\mu_{idle}^r$ are computed using all the non-as. The general idea is to solve $P1$ iteratively as $k$-means,  finding the cluster centers for each region $r$, $\mu_{a}^r$ using the labels $v_{r,q}^m$, and then finding the best labeling given the cluster centers.
+
+\section{Solving $P1$}
+
+\subsection{Finding the optimal labels given $\mu_{a}^r$}
+
+The most difficult step is to find the labels $v_{r,q}^m$ that minimizes $P1$ satisfying the constraints. 
+
+\paragraph{Exhaustive search} One alternative is to make an exhaustive search over the set of valid labeling. For instance, if there is $Q$ non-overlapping actions (the worst case), then the number of different labeling matrices is $16^Q$, which can be handled if $Q$ is small. When action intervals overlap, the possibilities decrease and possibly the problem can still be handled using exhaustive search. If there is small overlapping of action intervals, and Q is moderate, then alternative methods should be used.
+
+\paragraph{Relaxing the problem} Other alternative is relaxing the labels to lie in the $[0,1]$ interval, transforming the integer program into a linear program, that can be solved in polynomial time. Also, a sparsity regularization  term added to the relaxed variables could be useful to search for better solutions, keeping the problem as a linear program formulation. There is some alternatives to refine the solutions if needed:
+
+\begin{itemize}
+\item Branch and bound techniques for fractional values
+\item Cutting plane method for integer programming
+\end{itemize}
+
+\subsection{Finding the cluster centers}
+Given the labels, finding the cluster centers seems to be straightforward. Nevertheless, as some frames ``turned off'' if their  label become 0, there is still some doubts about the convergence rate of this algorithm, that should be explored with caution. 
+
+\section{Using classifiers scores instead of distortion metric}
+We could change the objective function to learn classifiers instead of cluster centers, maximizing the score of the classifiers instead of minimizing the distortion. One disadvantage is that J is unbounded, and we are maximizing, so we would need tor regularize $W$. For instance, a related formulation could be given by
+
+\begin{equation}
+\begin{split}
+P2)\quad \max J= &\sum_{m=1}^M \sum_{r=1}^R \sum_{q=1}^{Q_m} v_{r,q}^m  {W_{a_q}^r}^\top h_{r,q}^m  - \lambda \Omega(W)\\  \\  \text{s. to} \quad & 1 \le \sum_{r=1}^R v_{r,q}^m \le o_q^m \\ & \sum_{q=1}^{Q_m} v_{r,q}^m \le t_m \\ & v_{r,q_1}^m + v_{r,q_2}^m \le 1 \text{ if } q_1\cap q_2 \neq \emptyset \\  & v_{r,q}^m \in \{0,1\},~\forall m
+\end{split}
+\end{equation}
+
+
+\end{document}

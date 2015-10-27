@@ -1,0 +1,102 @@
+In our framework, we include a mechanism to identify and discard non-informative poses (NI) 
+appearing in some frames. The mechanism assigns a learnable score $\theta$ to frame poses
+that are non-informative to the action classifier
+(see Eq. (\ref{Eq_poseEnergy})).
+The poses from these frames are not accumulated into the pose histograms that
+are fed to the action classifiers.
+This enables to model to focus on more discriminative poses, which results in
+more discriminative classifiers.
+
+During learning, we need to initialize the set of candidate frame poses that can be considered 
+as NI.
+In practice, we initialize the NI poses by using the initial pose
+dictionary obtained with $k$-means, and selecting as NI the poses that are
+most distant to their assigned cluster centers. For each video,
+we initially assign a total of 20\% of the frames to the NI bucket.
+%To initialize training, during the first step of the learning algorithm the NI
+%frames are assigned to be the 20\% of the most disperse frames, in terms of the
+%distance to the assigned cluster center computed with $k$-means.
+As the learning progresses, on each iteration poses can be reassigned to
+a pose dictionary entry or to NI. In general, we observe that after convergence approximately 
+17\% of all training frames are assigned as non-informative.
+When we initialize the NI assignment with 40\% of the frames,
+our final model reduces this to 19\%.
+This indicates that
+our model is effectively learning to detect non-informative frames in
+the training videos.
+%A similar behavior is observed when selecting 40\% of frames as initial
+%non-informative frames, ending with 19\% of non-informative frames. This shows
+%the dataset, and opens an entire field to test the same idea in, for example,
+%patch-based object recognition.
+%On the other hand,
+%Also, 65\% of the initial NI poses were reassigned to a pose dictionary entry,
+Moreover, near 40\% of the initial pose assignments are updated throughout
+the iterations. This is compared to 25\% in preliminary model without
+non-informative pose handling. This indicates that our full model is capable of
+updating the pose representations more effectively.
+
+In terms of accuracy, the use of NI reduces the error in 1.8\% in
+MSR-Action3D, raising the accuracy from 90.6\% to 92.4\%. In the Composable Activities dataset the 
+introduction of NI causes the error to
+drop 1.4\% when using the SR regularizer, for a recognition accuracy of 92.2\%.
+%
+
+An important ability of the NI mechanism is that occluded regions are often
+assigned as NI poses. Figure \ref{fig:non_info_poses_sequence} shows a
+sequence of the activity \emph{Walking while reading}. In this figure, the bottom graph shows with 
+black boxes frames where a body region is identified by our method as corresponding to a 
+non-informative pose. Observing the body region corresponding to the arms, the long sequences of 
+non-informative
+poses nearly coincides with the occlusion periods of the arms (thick gray lines). Other frames
+considered as non-informative tend to be sparser in time, and they can be
+explained by rare poses or noisy body joints estimation. This behavior is
+advantageous in two ways: during learning, it allows the model to
+automatically disregard many occluded regions when learning the pose
+classifiers; and during testing, it allows the model to identify possible occluded regions.
+
+\begin{figure*}[t]
+\begin{center}
+\includegraphics[width=0.999\linewidth]{./fig_non_iinfo_poses.pdf}
+\end{center}
+\caption{\textforreview{Non-informative pose sequence for the four regions of
+the body, in a video from the activity \emph{Walking while reading}. The black
+squares represent frames labeled as a non-informative pose. A thick gray line
+shows when the corresponding region is occluded. We can observe a relation between body region 
+occlusions and identification of non-informative poses. Specifically,  when there is no occlusion, 
+the identification of non-informative poses
+tends to be temporally sparse, but for occluded intervals, many consecutive
+frames are selected as non-informative.} } \label{fig:non_info_poses_sequence}
+\end{figure*}
+
+Figure \ref{fig:NI_handling} shows a comparison of some learned pose dictionary
+entries with and without NI handling related to the activity \emph{Composed
+Activity 5}, whose main atomic actions are \emph{walking},
+\emph{gesticulating}, \emph{erasing board} and \emph{writing on board}. We show
+the best-scored and worst-scored frames where two or more body regions are not
+\emph{idle} or labeled as non-informative, i.e., correspond to poses that are
+supposed to be discriminative for the activity.
+Figure \ref{fig:NI_handling} illustrates that when using NI handling, the worst scored
+frames imputed
+as informative still preserve the semantics of the actions performed, while
+without NI, the worst poses are noisy and without real meaning for the
+performed action. Moreover, the non-informative frames in the right
+clearly show poses that are not specific to the activity (or any activity),
+and are correctly labeled as non-informative poses. This shows that using NI handling also helps 
+to increase the semantic interpretation of the learned pose classifiers.
+
+\begin{figure*}[tb]
+\begin{center}
+%\fbox{\rule{0pt}{2in} \rule{0.999\linewidth}{0pt}}
+\includegraphics[width=0.999\linewidth]{./fig_NI_poses.pdf}
+\end{center}
+\caption{Comparison of frames showing poses from videos of the activity
+\emph{Composed Activity 5}. All the presented frames belong to a subset of
+frames where there is at least two body regions active for the underlying action
+(not \emph{idle}). The best-scored
+frames are similar with both setups. However, when considering the worse-scored
+frames, it is clear that for the original model there are poses that are
+not helping to the activity prediction. In general, those poses are labeled as
+non-informative with our proposed modification, where the worse-scored poses of the new model
+still remain discriminative and semantically valid for the target activity.}
+\label{fig:NI_handling}
+\end{figure*}
