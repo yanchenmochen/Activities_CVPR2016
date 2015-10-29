@@ -1,0 +1,29 @@
+\begin{figure}[tb]
+\begin{center}
+\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+%\includegraphics[width=0.99\linewidth]{./fig_graphical_hierarchic_model.pdf}
+%\vspace{-1.3cm}
+\end{center}
+   \caption{Graphical representation of our discriminative hierarchical model for recognition of composable human activities.
+At the top level, activities are represented as compositions of atomic actions that are inferred at
+the intermedite level. These actions are in turn compositions of poses at the
+lower level, where pose dictionaries are learnt from data. Our model also learn
+temporal transitions between consecutive poses and actions. Best viewed in
+color.}
+\label{fig:overview}
+%\vspace{-0.4cm}
+\end{figure}
+Our model is organized according to a 3-level hierarchy, where each level represents semantic 
+information at a different level of abstraction. This allows us to provide semantic and 
+interpretable predictions of the body poses, actions, and activities that are present at each video 
+frame. We start by describing the input data and video representation used in our framework. We then 
+present the main details of our model as well as the learning and inference schemes.
+% We present a 3-level hierarchal model, where each level is semantically interpretable, and which output is useful annotated data of actions and poses  for all frames, as well as the overall activity of the videos.
+%First we present the video representation used as inputs to the model; then, the hierarchic model to address the jointly learning of classifiers for activities, actions and poses, presenting also the metodology to solve the model.
+\input{videoRepresentation}
+\input{hierarchicalModel}
+%\input{learning}
+\input{inference}
+
+
+

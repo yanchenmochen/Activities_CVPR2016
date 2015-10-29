@@ -1,8 +1,4 @@
-
 %%%***************************LEARNING************************************%%%
-
-\begin{comment}
-
 In the following, we provide the details of the algorithm for learning the
 parameters of the hierarchical model proposed in this paper.
 %Recall that we formulate learning as the optimization problem in
@@ -281,7 +277,7 @@ Using a small value for $\mu$ and a relatively high value of $\rho$ produce the 
 
 With some minor changes, we can include non-negativity constraints for the primal variables in the dual formulation. Specifically, we use non-negativity constraints in the classifiers $\alpha$ and $\beta$, with the objective that the sparse coefficients generated resemble a generative approach. Each non-negative variable adds a new dual variable, so we will have new dual variables $\phi_\alpha$ and $\phi_\beta$. In practice, only the dual variables associated to constraints are computed, as $\phi_\alpha$ and $\phi_\beta$ can be computed in closed form, as they try to make the associated original weight to zero, so $\phi_\alpha = \max(0,-\bar\Psi_\alpha \phi_c)$ and $\phi_\beta = \max(0,-\bar\Psi_\beta \phi_c)$, with $\phi_c$ the dual variables associated to the working set of constraints.  
 
-\end{comment}
+
 
 %(PERHAPS THE NEXT TWO PARAGRAPHS SHOULD BE MOVED TO LEARNING SECTION)
 \begin{comment}

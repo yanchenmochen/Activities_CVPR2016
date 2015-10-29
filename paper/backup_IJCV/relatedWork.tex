@@ -1,0 +1,146 @@
+Visual recognition of human activities is a very active topic in the computer vision
+literature, as there are many potential applications that could benefit from
+reliable understanding of human behavior. Recent surveys show the breath
+of prior work \cite{Aggarwal2011,vishwakarma2013survey,weinland2011survey},
+while also pointing at challenges and limitations of current methods. Here,
+we briefly survey some of the most relevant previous work that relates
+to the methods proposed in this paper.
+
+In terms of recognition of composable activities, a number of researchers have tackled this problem 
+using composition of actions and low-level representations based on local interest points 
+\cite{Dollar2005,Laptev2005} by modeling their temporal arrangement. Some researchers have extended 
+single image representations, such as correlatons \cite{Savarese2006} and spatial pyramids 
+\cite{Lazebnik:Schmid:Ponce:2006} to videos \cite{Laptev2008}, and have applied them to the problem 
+of simple human action categorization. Others have proposed models for decomposing actions into 
+short temporal motion segments \cite{Gaidon2013,Niebles2010a}, but cannot capture spatial 
+composition of actions. Recently, several graph-based models have been proposed to account for 
+spatio-temporal composition of low-level features \cite{Amer2012,Brendel2010,Brendel2011}.
+
+Instead of focusing on low-level video features, our proposed model builds
+a pose-based representation by first extracting information about
+the pose of the actor. There is a significant amount of pose-based action
+recognition methods in the literature. However, traditional methods
+have several limitations, for example silhouette based recognition methods
+assume a static camera \cite{Bobick2001,Thurau2008}. An alternative to avoid
+detailed and precise pose estimation is to use a
+coarser representation of human poses such as poseletes \cite{Bourdev2009,raptis2013poselet}.
+However, even if accurate body pose estimation
+is available, these methods are tremendously affected by body occlusions
+and by unrelated limb postures and motions that are not involved in the
+action. In our case, we alleviate these problems using a hierarchical model that
+integrates the estimation of a dictionary of body poses with the inference of more elaborated
+levels of abstractions, such as atomic actions and composable
+activities. In particular, our current model includes the flexibility 
+to filter-out body poses that are not involved in the current action.
+
+Another line of work looks at annotating novel
+action videos by recognizing single actions \cite{Ramanan2003}, but ignoring
+the composition of those single actions into meaningful complex activities. As an example, in
+\cite{Ikizler2008a}, the authors propose a model that composes actions using HMMs, but its application to activity
+classification is not discussed.
+%In terms of models that leverage action compositions.
+In \cite{Koppula2012}, a
+Markov Random Field is trained over small temporal segments.
+Their model includes the detection of objects and object affordance labels.
+In \cite{Wei2013}, wavelet features are computed over temporal segments
+in each body joint. Their resulting model infers the underlying temporal structure of sequences of actions.
+
+
+In this paper, our goal is to recognize composed activities from RGB-D
+videos.
+Recently, the interest in recognition of human actions and activities from RGB-D
+videos has increased rapidly \cite{aggarwal2014human}
+mainly due to availability of capable and inexpensive new sensors.
+Some methods for low-level feature extraction have been proposed to leverage
+the 3D information available on RGB-D data
+\cite{Oreifej2013,wan20143d,luo2014spatio}.
+Furthermore, the availability of
+fast algorithms for human pose estimation
+\cite{Shotton2011,Microsoft2012} from depth images
+helps to overcome the difficulty and high computational expense of human
+pose estimation from color images only.
+This has motivated a significant amount of methods that build
+representations on top of human
+poses
+\cite{Sung2012,Xia2012,Escorcia2012,vemulapalli2014human}.
+In addition to the use of body pose features, other researchers
+have also proposed fusing them with low-level features from
+color \cite{chaaraoui2013fusion,Shahroudy2014,zhu2013fusing} or depth \cite{Wang2012}.
+Unfortunately,
+these methods usually focus on categorizing simple and non-composed
+activities.
+
+
+From a learning perspective, our work is related to methods for learning
+visual dictionaries from data. Early frameworks for dictionary learning focus on
+vector
+quantization, using $k$-means to cluster low-level keypoint
+descriptors
+\cite{Csurka:EtAl:04}. These approaches have spawned
+algorithmic variations that use alternative quantization methods,
+discriminative dictionaries, or different pooling schemes
+\cite{Jurie:Triggs:05,Lazebnik:Schmid:Ponce:2006}. Recently, sparse
+coding methods have also been used to obtain meaningful dictionaries that achieve low
+reconstruction error, high recognition rate, and attractive computational properties 
+\cite{Castrodad:Sapiro:12}. Discriminatively trained sparse
+representations have also been proposed \cite{Boureau:Etal:10,Mairal:EtAl:08}, mostly building specific dictionaries for each
+target category. In contrast to our approach, these methods have mostly focused on
+non-hierarchical cases, where there is a weak
+connection between the construction of the mid-level dictionaries and the implementation of
+the top-level classifiers \cite{Yang2009}.
+
+Our model also builds on ideas related to learning classifiers using a
+discriminative framework and latent variables. In
+particular, \cite{Felzenszwalb:Mcallester:Ramanan:2008} uses a latent SVM
+scheme to develop an object recognition approach based on mixtures of multiscale
+deformable part models. This model is later extended to the case of action
+recognition \cite{Niebles2010a}. In contrast to our approach, the model in
+\cite{Niebles2010a} is limited to binary classification
+problems. Recently,
+\cite{Wang:Mori:11} proposes a hierarchical latent variable approach to action
+recognition that directly considers the
+multiclass classification case. Their layered model
+incorporates information about patches, hidden-parts, and action class, where
+the meaning of the hidden layers is not clear. In contrast, our hierarchical
+model integrates semantically meaningful information at all layers: poses,
+actions, and activities. Unlike \cite{Wang:Mori:11}, our model can account for
+compositions of actions into activities and, as a byproduct, outputs
+per-body-region and per-frame action classification, so it has the appealing
+property that mid-level semantics are produced in addition to the final activity
+classification decision. \cite{Wang2012} proposes a model for action recognition
+in static images but it is not clear if an
+extension to spatio-temporal compositions is possible. Similarly to our
+approach, \cite{Wang:Mori:11} and \cite{Wang2012} also use a latent SVM
+machinery for model learning and inference, but details of the formulations
+and regularization schemes are distinct to our framework.
+However, note that we focus the novelty of this paper in the formulation of
+hierarchical model for recognition of composable activities,
+%Furthermore, the
+%novelty of our work is the proposed model,
+not the actual learning/inference algorithms.
+
+In terms of hierarchical compositional models, our work is related to recent
+recognition approaches based on deep learning (DL)
+\cite{Bengio:09,KrizhevskyEtAl:12}.
+Most previous work on DL has a focus
+on analysis of static images.
+However, their training process has some
+similarities with our approach, since both incorporate joint hierarchical
+estimation of connected layers, spatial pooling
+schemes, and intermediate representations based on linear filters.
+DL is usually applied over the raw image representation using several layers of
+generic structures. As a consequence, DL architectures have a large number of
+parameters and they are usually difficult to train. In contrast, we embed
+semantic knowledge to our
+model by explicitly exploiting compositional relations among
+poses, actions, and activities. This leads to simpler architectures and
+enables incorporating labeled data at intermediate layers. Furthermore, our
+max-margin approach is based on a Hinge loss,
+and not quadratic or logistic functions commonly used to train DL architectures
+leading to different optimization problems.
+
+Our method tackles some limitations of previous work with
+a new framework that models spatio-temporal compositions of activities using a
+hierarchy of three semantic levels. The compositional properties of our model
+enable it to provide meaningful annotations and to handle occlusions naturally.
+We discuss the details of our model in the following section.

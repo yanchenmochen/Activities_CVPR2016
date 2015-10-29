@@ -5,44 +5,44 @@ Database file #1: AsaReferences_no_url.bib
 Database file #2: references.bib
 Database file #3: library_niebles_no_url.bib
 Database file #4: ILReferences_no_url.bib
-You've used 52 entries,
+You've used 1 entry,
             2120 wiz_defined-function locations,
-            794 strings with 11890 characters,
-and the built_in function-call counts, 16614 in all, are:
-= -- 1473
-> -- 933
+            524 strings with 4332 characters,
+and the built_in function-call counts, 324 in all, are:
+= -- 25
+> -- 18
 < -- 0
-+ -- 368
-- -- 312
-* -- 1124
-:= -- 2813
-add.period$ -- 155
-call.type$ -- 52
-change.case$ -- 312
++ -- 7
+- -- 6
+* -- 21
+:= -- 60
+add.period$ -- 3
+call.type$ -- 1
+change.case$ -- 6
 chr.to.int$ -- 0
-cite$ -- 52
-duplicate$ -- 665
-empty$ -- 1414
-format.name$ -- 312
-if$ -- 3439
+cite$ -- 1
+duplicate$ -- 14
+empty$ -- 29
+format.name$ -- 6
+if$ -- 65
 int.to.chr$ -- 0
-int.to.str$ -- 52
-missing$ -- 51
-newline$ -- 262
-num.names$ -- 104
-pop$ -- 415
+int.to.str$ -- 1
+missing$ -- 1
+newline$ -- 8
+num.names$ -- 2
+pop$ -- 10
 preamble$ -- 1
-purify$ -- 260
+purify$ -- 5
 quote$ -- 0
-skip$ -- 383
+skip$ -- 7
 stack$ -- 0
-substring$ -- 647
-swap$ -- 85
+substring$ -- 5
+swap$ -- 2
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 208
+type$ -- 4
 warning$ -- 0
-while$ -- 131
-width$ -- 54
-write$ -- 537
+while$ -- 2
+width$ -- 2
+write$ -- 12

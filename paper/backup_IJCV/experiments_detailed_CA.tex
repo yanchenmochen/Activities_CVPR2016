@@ -1,0 +1,262 @@
+%We use $K = 50$ poses for each body part (a total of 200 poses), 
+%which provides a good compromise between computational load and recognition accuracy.
+%Our method is relatively robust to the size of the pose dictionary. A low
+%number of poses per body part (5 to 20) lacks representativity, and a
+%high number increases the computational load and increases over-fitting. In our
+%experiments, we observe similar performance for the case of 50, 100 and 150
+%poses per body part. When testing with 25 poses the accuracy drops by 6\%. We did not test larger
+%dictionaries due to high processing time, which is quadratic with respect to
+%dictionary size.
+
+\subsection{Inference of per-frame annotations.}
+\label{subsec:action_annotation}
+The hierarchical structure and compositional
+properties of our model enable it to output a predicted global activity,
+as well as per-frame annotations of predicted atomic actions and poses for each body
+region.
+It is important to highlight that in the generation of the per-frame annotations, no prior temporal 
+segmentation of atomic actions is needed. Also, no post-processing of the output is performed. The  
+proficiency of our model to produce
+per-frame annotated data, enabling action detection temporally and
+spatially, make our model unique. 
+
+Figure \ref{fig:annotation} illustrates
+the capability of our model to provide per-frame annotation of the atomic
+actions that compose each activity. The accuracy of
+the mid-level action prediction can be evaluated as in \cite{Wei2013}.
+Specifically, we first obtain segments of the same predicted action in each
+sequence, and then compare these segments with ground truth action labels. The
+estimated label of the segment is assumed correct if the detected segment is
+completely contained in a ground truth segment with the same label, or if the
+Jaccard Index considering the segment and the ground truth label is greater
+than 0.6. Using these criteria, the accuracy of the mid-level actions is
+79.4\%. In many cases, the wrong action prediction is only highly local in time
+or space, and the model is still able to correctly predict the activity label
+of the sequence. Taking only the correctly predicted videos in terms of global
+activity prediction, the accuracy of action labeling reaches 83.3\%. When consider this number, it 
+is
+important to note that not every ground truth action label is accurate: the
+videos were hand-labeled by volunteers, so there is a chance for mistakes in
+terms of the exact temporal boundaries of the action. In
+this sense, in our experiments we observe cases where the predicted
+labels showed more accuracte temporal boundaries than the ground 
+truth.
+%As an example, in
+%some videos a walking action that last only a few frames is correctly
+%predicted, where it was not identified during the labeling process, but it lead
+%to errors in the action prediction.
+%\JC{Alvaro: aclarar ultima frase}
+
+ 
+\begin{figure*}[th]
+\begin{center}
+\includegraphics[width=0.999\linewidth]{./fig_all_sequences_red.pdf}
+%\includegraphics[width=0.999\linewidth]{./fig_examples_action_annotation.pdf}\\
+%\includegraphics[width=0.999\linewidth, trim= 0 0 200 0, clip]
+%{./subject_1_32.pdf}\\
+%\includegraphics[width=0.999\linewidth]
+%{./subject_2_21.pdf}\\
+%%\includegraphics[width=0.95\linewidth]
+%%{./subject_6_23.pdf}\\
+%\includegraphics[width=0.999\linewidth]
+%{./subject_6_30.pdf}\\
+%%\vspace{-0.5cm}
+\end{center}
+\caption{Per-frame predictions of atomic actions for selected activities,
+showing 20 frames of each video. Each frame is joined with the predicted action
+annotations of left arm, right arm, left leg and right leg. Besides the prediction of the global 
+activity of the video, our algorithm is able to
+correctly predict the atomic actions that compose each activity in each frame,
+as well as the body regions that are active during the execution of the action.
+Note that in the example video of the activity \emph{Walking while calling with
+hands}, the \emph{calling with hands} action is correctly annotated even when
+the subject change the waving hand during the execution of the activity.}
+%\vspace{-0.4cm}
+\label{fig:annotation}
+\end{figure*}
+
+\subsection{Robustness to occlusion and noisy joints.}
+Our method is also capable of inferring action and activity labels even if some
+joints are not observed. This is a common situation in practice,
+as body motions induce temporal self-occlusions of body regions.
+Nevertheless, due to the joint estimation of poses, actions, and activities,
+our model is able to reduce the effect of this problem. To illustrate this, we
+simulate a totally occluded region by fixing its geometry to the position
+observed in the first frame.
+We select which region to be completely occluded in every sequence using uniform sampling.
+In this scenario, the accuracy of our preliminary model in \cite{Lillo2014} drops
+by 7.2\%. Using our new SR setup including NI handling, the accuracy only drops
+by 4.3\%, showing that the detection of non-informative poses helps the model
+to deal with occluded regions. In fact, as we show in Section
+\ref{subsec:exp_non_info_handling}, many of truly occluded regions in the
+videos are identified using NI handling. In contrast, the drop in performance of
+BoW is 12.5\% and HMM 10.3\%: simpler models are less capable of robustly dealing
+with occluded regions, since their pose assignments rely only on the descriptor
+itself, while in our model the assigned pose depends on the descriptor,
+sequences of poses and actions, and the activity evaluated, making inference
+more robust. Fig. \ref{fig:occlusions} shows some qualitative results of
+occluded regions.
+
+%\begin{figure}[t]
+%\begin{center}
+%\includegraphics[width=0.95\linewidth]{./jc/M_actionG_C2000_SUB.pdf}
+%\includegraphics[width=0.95\linewidth]{./jc/M_actionG_optim.eps}
+%\vspace{-0.5cm}
+%\end{center}
+ %  \caption{Confusion matrix for the action classification task. Rows are the
+%ground truth actions at each frame, while columns are the predicted
+%mid-level action label inferred by our model.}
+%\label{fig:confusion_actions}
+%\vspace{-0.4cm}
+%\end{figure}
+
+\begin{figure}[tb]
+\begin{center}
+%\fbox{\rule{0pt}{0.5in} \rule{0.9\linewidth}{0pt}}
+\includegraphics[width=0.999\linewidth]
+{./subject_1_6.pdf} \\
+{\footnotesize Right arm occluded} \\
+%\fbox{\rule{0pt}{0.5in} \rule{0.9\linewidth}{0pt}}
+\includegraphics[width=0.999\linewidth]
+{./subject_1_23.pdf}\\
+{\footnotesize Left leg occluded}  \\
+%\fbox{\rule{0pt}{0.5in} \rule{0.9\linewidth}{0pt}}
+\includegraphics[width=0.999\linewidth]
+{./subject_1_8.pdf}\\
+{\footnotesize Left arm occluded}\\
+%\vspace{-0.3cm}
+\end{center}
+\caption{The occluded body regions are depicted in light blue. When an arm or
+leg is occluded, our method still provides a good estimation of the underlying actions in each
+frame.}
+\label{fig:occlusions}
+%\vspace{-0.6cm}
+\end{figure}
+
+In terms of noisy joints, we manually add random Gaussian noise to change the
+joints 3D location of testing videos, using the SR setup and the GEO descriptor
+to isolate the effect of the joints and not mixing the motion descriptor. Figure
+\ref{fig:joint_noise} shows the accuracy of testing videos in terms of noise
+dispersion $\sigma_{noise}$ measured in inches. For little noise, there is no
+much effect in our model accuracy, as expected for the robustness of the
+geometric descriptor. However, for more drastic noise added to every joint, the
+accuracy drops dramatically. This behavior is expected, since for highly noisy
+joints the model can no longer predict well the sequence of actions and poses.   
+
+\begin{figure}[tb]
+\begin{center}
+%\fbox{\rule{0pt}{1in} \rule{0.999\linewidth}{0pt}}
+\includegraphics[width=0.999\linewidth]{./fig_acc_vs_noise.pdf} \\
+\end{center}
+\caption{Performance of our model in presence of simulated Gaussian noise in
+every joint, as a function of $\sigma_{noise}$ measured in inches. When the
+noise is less than 3 inches in average, the model performance is not very
+affected, while for bigger noise dispersion the model accuracy is drastically
+affected. It is important no note that in our simulation, every joint is
+affected to noise, while in a real setup, noisy joint estimation tend to occur
+more rarely. } \label{fig:joint_noise}
+\end{figure}
+
+\subsection{Early activity prediction.}
+Our model needs the complete video to make an accurate activity and action
+prediction of a query video. In this section, we analyze the number of frames
+(as a percentage of a complete activity sequence) needed
+to make an accurate activity prediction. Figure \ref{fig:accuracy_reduced_frames}
+shows the mean accuracy over the dataset (using leave-one-subject-out
+cross-validation) in function of the
+percentage of frames used by the classifier to label each video. We note that
+considering 30\% of the frames, the classifier performs reasonable predictions,
+while 70\% of frames are needed to closely match the
+accuracy of using all frames.
+\begin{figure}[tb]
+\begin{center}
+\includegraphics[width=0.999\linewidth]{./fig_acc_vs_frame_reduction.pdf}
+\end{center}
+\caption{Accuracy of activity recognition versus percentage of frames used in
+Composable Activities dataset. In general, 30\% of the frames are needed to
+perform reasonable predictions, while 70\% of frames are needed to closely match the
+accuracy of using all frames.}
+\label{fig:accuracy_reduced_frames}
+\end{figure}
+
+\subsection{Failure cases.}
+
+We also study some of the failure cases that we observe during the
+experimentation with our model.
+%As all models, there will be a few errors in the predicted activity for testing
+%videos.
+Figure \ref{fig:errors} shows some error cases. It is interesting that
+the sequences are confusing even for humans when only the skeleton is available
+as in the figure. These errors probably will not be surpassed with the model
+itself, and will need to use other sources of information like object
+detectors, where a cup should be distinguished from a cellphone as in the
+third row of Figure \ref{fig:errors}.
+
+\begin{figure}[tb]
+\begin{center}
+%\fbox{\rule{0pt}{0.5in} \rule{0.9\linewidth}{0pt}}
+\includegraphics[width=0.999\linewidth]
+{./sbj1_1.pdf} \\
+{\footnotesize Ground truth: Walking while calling with hands\\
+Prediction: Walking while waving hand} \\
+%\fbox{\rule{0pt}{0.5in} \rule{0.9\linewidth}{0pt}}
+\includegraphics[width=0.999\linewidth]
+{./sbj4_4.pdf}\\
+{\footnotesize Ground truth: Composed activity 1\\
+Prediction: Talking on cellphone and drinking}  \\
+%\fbox{\rule{0pt}{0.5in} \rule{0.9\linewidth}{0pt}}
+\includegraphics[width=0.999\linewidth]
+{./sbj4_6.pdf}\\
+{\footnotesize Ground truth: Waving hand and drinking\\
+Prediction: Talking on cellphone and scratching head} \\
+%\vspace{-0.3cm}
+\end{center}
+\caption{Failure cases. Our algorithm tends to confuse activities that share very similar
+body postures.}
+%\JC{Alvaro: podria mejorarse, pero no es algo importante}}
+\label{fig:errors}
+%\vspace{-0.5cm}
+\end{figure}
+
+
+\begin{comment}
+\subsubsection{New activity characterization}
+As we mention in previous section, our model using sparse regularization and
+non-negative weights on activity ($\alpha$) classifiers and action ($\beta$)
+classifiers do not \emph{punish} poses that have no influence in the
+activities. For this reason, our model is able to model a new composed activity
+just combining the coefficients of two known activities, leaving the rest of
+the parameters of the model untouched. We use an heuristic approach to combine
+two models: givint two classes $c_1$ and $c_2$, their coefficients for a region
+$r$ and action $a$ are $ \alpha^r_{c_1,a}$ and $ \alpha^r_{c_2,a}$
+respectively. For a new class $c_{new}$ composed of classes $c_1$ and $c_2$, we
+use the mean value of the coefficients \begin{equation}
+\alpha^r_{{c_{new},a}} = \frac{(\alpha^r_{c_1,a} + \alpha^r_{c_2,a})}{2}
+\end{equation}
+ only when the corresponding coefficients for are positive; in other case, we
+use the maximum value of the two coefficients. For all subjects of the dataset,
+we create all the combinations od two activities, and tested the new model
+using three composed videos per subject. The average accuracy of the activity
+$16+1$ is 90.2\%, and in average the activities that compose the new activity
+drops its accuracy in 12.3\%, showing that we effectively incorporate a new
+composed activity to the model at a little cost of getting more confusion over
+the original activities. Moreover, the accuracy of action labeling for the new
+class is 74.2\%,  similar to the accuracy of the action labeling of the
+original model, so we can effectively transfer the learning of atomic action
+classifiers to new compositions of activities. 
+
+\begin{table}
+\begin{tabular}
+\hline
+Activity group & Accuracy of new class & \\ 
+\hline
+Simple & 92.2% &  \\
+Complex & 87.2\% & \\
+\hline
+All & 90.2\% & \\
+\end{tabular}
+\caption{}
+\label{tab:acc_new_class}
+\end{table}
+
+\end{comment}

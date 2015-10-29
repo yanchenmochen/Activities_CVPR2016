@@ -1,0 +1,47 @@
+In the preliminary version of our model \cite{Lillo2014},
+we describe each frame using cues related to the geometry of the skeleton joints (GEO).
+%we only use body joint positions from the estimated skeleton to compute our descriptor,
+%disregarding valuable RGB motion information.
+In this paper, we augment the representation by including a dynamic descriptor
+that captures local dynamic information
+as described in Section \ref{subsec:videorepresentation}. As reported in Tables \ref{tab:msr} and 
+\ref{Table-UniNorte}, we present experimental results using the geometric descriptor (GEO), as well 
+as the fused descriptor (GEO/MOV).
+
+It is important to note that giving that the MSR-Action3D dataset does not include RGB information,
+we modify the motion descriptor described in Section 
+\ref{subsec:videorepresentation}. Specifically,
+we encode differences of displacements for every joint, in a similar setup to
+\cite{WangCVPR2011}.
+This results in an 18 dimensional motion descriptor for each body region,
+since each region contains 6 joints and each joint is a 3D vector.
+The preliminary the version of our model \cite{Lillo2014} that uses
+a quadratic regularizer and geometric features only,
+we achieve a classification accuracy of 89.5\%.
+By incorporating dynamic features,
+we achieve an action classification accuracy of 90.6\%, reducing the error by 1.1\%. In the 
+Composable Activities dataset, we use the motion descriptor described in Section 
+\ref{subsec:videorepresentation}.
+By adding the dynamic descriptor, the
+improvement in accuracy is more notorious than in MSR-Action3D,
+reducing the error by 5.2\% and 5.7\% according to the use of QR or SR regularizers, respectively.
+
+Fig. \ref{fig:geo_mov_importance} shows the relative weight
+of the geometric descriptor and motion descriptor in relation to each activity class
+for the right arm and right leg. Focusing on right arm (left graph), note that
+for actions like \emph{scratching head}, \emph{throwing an object} or
+\emph{erasing the board}, the geometry of the joints is relatively more
+important that the motion cues. Inversely, for other actions like
+\emph{gesticulating} or \emph{calling with hands} the motion descriptor is more
+important in average, since for these actions the movement of the arm is where
+the information is encoded. 
+
+\begin{figure}[tb]
+\begin{center}
+%\fbox{\rule{0pt}{2in} \rule{0.999\linewidth}{0pt}}
+\includegraphics[height=2.2 in]{./fig_desc_relative_right_arm_mod.pdf}
+\includegraphics[height=2.2 in]{./fig_desc_relative_right_leg_mod.pdf}
+\end{center}
+\caption{Relative importance of geometric (GEO) and motion (MOV) descriptors for right arm (left) and right leg (right).}
+\label{fig:geo_mov_importance}
+\end{figure}
