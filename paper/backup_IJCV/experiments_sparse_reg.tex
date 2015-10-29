@@ -1,0 +1,181 @@
+%\JC{Alvaro: El primer parrafo repite la explicacion ya presentada en seccion 3.4.}
+%In this paper, we have extended our model by introducing sparse
+%regularization to improve the use of poses in the dictionary.
+%In the preliminary version of our framework \cite{Lillo2014}, the model
+%parameters are optimized using a quadratic regularization, leading to unregularized pose assignments.
+In this paper we extend our preliminary model by introducing
+a new regularizer that consists of a mixture of $L_2$ and $L_1$
+norms for the atomic action
+classifiers $\beta$ (see Equation \ref{eq:general_regularizer}).
+The goal of the new regularization is to obtain a more
+efficient use of the dictionary of body poses, in the sense that the model
+learns more specialized poses for each atomic action, which also encourages
+the fewer poses to be influential for each activity. For testing the effects of
+sparse regularization in $\beta$, we use the Composable Activities dataset since
+it provides richer hierarchical annotations.
+We use fixed values $\mu=0.1$ and $\rho=5$ of
+Eq. (\ref{eq:general_regularizer}) using sparse regularizer
+(SR), contrasting the usual values used for $L_2$ regularizer (QR) $\mu=1$ and
+$\rho=0$. Also, for QR setup, the number of poses is set to $K=50$ per body
+region, while for SR is set to $K=150$ per body region.
+
+In our experiments, we observe that when using SR only 8 to 11\% of the coefficients of $\beta$
+remain non-zero. In average, this means a reduction of 85\% in the number of non-zero terms 
+with respect to the use of QR. In terms of accuracy, as we see in Table \ref{Table-UniNorte},
+recognition performance using sparse regularizer (SR) is similar to the case of
+a quadratic
+regularizer (QR), decreasing the error in 0.4\% when using the fused descriptor
+and NI handling, and slightly increasing the error when the other modifications
+are not applied. Despite the similar recognition accuracy provided by both regularizers, we 
+identify at least three relevant advantages of using the SR setup:
+
+\paragraph{i) Increased robustness to overfitting problems when using a sparse regularizer.} Figure 
+\ref{fig:acc_vs_K_CA} shows recognition accuracy in function of the pose dictionary size $K$ when 
+using QR and SR in
+the Composable Activities dataset. We observe that when using QR the model clearly overfits as the 
+dictionary grows larger than $K=50$. In contrast, using the SR setup, the
+accuracy tends to increase or at least hold when larger dictionaries are used.
+This behavior shows that the model using SR regularizer is best suited to be used
+in larger models, since the learned poses are more specialized, and the model shows an 
+increased robustness to overfitting problems. 
+
+\begin{figure}[tb]
+\begin{center}
+%\fbox{\rule{0pt}{2in} \rule{0.999\linewidth}{0pt}}
+\includegraphics[width=0.999\linewidth]{./fig_acc_vs_K.pdf}
+\end{center}
+\caption{Accuracy of testing versus the number of pose dictionary entries per
+body region ($K$), for QR and SR setups. Note the decreasing accuracy of QR
+setup (quadratic regularizer), indicating overfitting when more pose dictionary
+elements are used, whereas using a sparse regularizer (SR) the accuracy remains
+almost with no change. } \label{fig:acc_vs_K_CA}
+\end{figure}
+
+\paragraph{ii) Fewer poses influence each activity.}
+One of the goals of using a sparse regularizer is to decrease the number of
+entries from the pose dictionary that are used by each action classifier.
+Since few pose dictionary entries
+are required to explain each action (and therefore each activity),
+this encourages every action to rely on a smaller group of poses, which usually
+helps in improving the generalization power of the model,
+the semantic interpretability of the poses,
+and the efficiency of the pose dictionary.
+%The
+%influence (Eq. (\ref{XX})) of the poses aggregated for all activities
+%and \ref{fig:poses_decay_C6}. Note the fast decay for pose influence when
+%using the
+%sparse regularizer, meaning that the model will focus on less poses when inferring the
+%activity and actions of the video. Also, note the less decay in a more complex
+%activity like \emph{Composed Activity 6} compared to \emph{Walking while hand waving};
+%more poses influence the classification when the activity is more complex.
+To illustrate this behavior, Figure \ref{fig:influence_agg} includes two diagrams corresponding to 
+the influence (measured by Eq. (\ref{eq:influence})) of the
+pose dictionary entries of right arm, across all activities, for QR setup (top
+diagram) and SR setup (bottom diagram). We binarize the influence using a threshold
+corresponding to the 5\% of the top influence value, to better showcase the
+grouping effect.  For a fair comparison, $K=50$ is used in both setups, and we
+use the same initial pose labels $Z$ to make the poses comparable. It is clear
+from the figure that in the QR setup each activity is influenced by many poses
+(and therefore each pose entry has activations in many activities), without a
+clear pattern of pose activations. In this setup, 17.8 pose entries
+influence each activity in average;
+in contrast, for SR setup, only 8.6 poses in
+average are influential for each activity, showing a sparse pattern. Since the
+pose dictionary and atomic action classifiers are shared by all activities, the
+grouping effect is straightforward, since the activities that share a common
+action will also share its poses. As an example, if we observe the activations for the 
+three activities
+composed by the action \emph{Talking on cellphone}, many common poses are shared by these three
+activities, and few of them are not, showing a grouping effect. Moreover, for those activities that 
+do not
+share atomic actions, the poses tend to be also non-shared. We omit from the
+analysis the \emph{idle} action to enforce the influence of actual annotated
+actions.
+
+\begin{figure}[tb]
+\begin{center}
+%\fbox{\rule{0pt}{2in} \rule{0.999\linewidth}{0pt}}
+\includegraphics[width=0.999\linewidth]{./fig_influence_QR_vs_SR.pdf}
+\end{center}
+\caption{Graphical representation of the influence of right-arm poses (using
+$K=50$) in the activities of the Composable Activities dataset, using quadratic
+regularizer (QR) and sparse regularizer (SR) (black is for influence score above a given 
+threshold). Note that the SR setup
+allows each activity to be represented by fewer poses, increasing the
+interpretability of the poses generated by the model and the efficiency in pose
+usage.
+%\JC{JC: Aqui negro es desactivo, en la fig 9, negro indica activo. Es un poco confuso...}
+%\JC{Alvaro: Seria posible generar una figura en que se cambia el orden del eje
+%X. Tal que se ordena segun hamming distance (in a binary vector como cada
+%columna de la figura), esto deberia permitir la visualizacion de grupos.
+%Tambien se podria reportar el numero promedio de features usadas en figuras a
+%y b para mostrar la reduccion del numero de poses usadas por cada clase.}
+}
+\label{fig:influence_agg}
+\end{figure}
+%
+\paragraph{iii) Improved semantical interpretation of poses.}
+The SR setup helps to improve the semantic meaning of the learned poses.
+Observing Fig. \ref{fig:influence_agg}, the learned poses are
+related to the actions involved in the activities. For example, just considering
+poses 1 to 5 in the figure, we observe that in the SR setup they influence
+the activities \emph{Composed Activity 4}, \emph{Waving hand and drinking}, and
+\emph{Walking while waving hand}. It is clear that this 
+group of poses correspond to the
+right arm body region. Furthermore, they are related to the \emph{waiving hand} action, since 
+it is the only
+action that appears in all these activities. This kind of interpretation is not
+possible under the QR setup. We foresee that the relevance of this type of interpretations can 
+increase as new recognition scenarios will require the interpretation
+of a larger number of actions. Note that we omit the \emph{idle} action when computing the influence scores for clarity (all activities share the\emph{idle} action), that is why some rows of Fig. \ref{fig:influence_agg} are all white (not influential to any activity).
+
+%Additionally, we force the
+%coefficients of the activity and atomic action classifiers to be positive, forcing the
+%model to focus in the poses actually \emph{present} in each action and activity, and
+%not \emph{punishing} the poses that should not be present. It is remarkable that using
+%only positives weights for $\alpha$ and $\beta$, and also using small groups of poses
+%for each $\beta$, the recognition accuracy is the same as the more unconstrained
+%discriminative problem. We see several advantages in using the sparse regularizer with
+%positive weights: the model does a more efficient use of the pose dictionary, as higher level
+%classifiers only see relevant poses. By using only positives weights in the higher level
+%classifiers, we are fostering the model to behave similarly to a generative model, so
+%merging two activities to create a new composed activity could be made at no cost.
+%%; we
+%%will explore this property as part of our future work.
+%Also, the positive weights
+%force the model to focus on present actions in the videos, making the activity
+%classifiers naturally sparse.
+
+
+
+%\textforreview{
+%In addition to the regulaizer, the extended model also adds a new term into
+%the loss function that
+%penalizes the diversity of learned poses inside an executed atomic action: for
+%testing videos, the diversity of poses decreases 30\% compared to the previous
+%model (QR), and 21\% compared to the new model using sparse regularizer but
+%without considering the pose diversity penalty. All three models have similar
+%accuracy on test videos, but the proposed sparse model produces each video to be
+%represented by a small number of more representative learned poses.
+%}
+
+
+%\begin{figure*}[t]
+%\begin{center}
+%\includegraphics[width=0.95\linewidth]{./Influence_WH_modelGS_H.pdf} \\ (a) \\
+%\includegraphics[width=0.95\linewidth]{./Influence_WH_model_H.pdf} \\ (b) \\
+%\end{center}
+%\caption{Influence of poses in activity \emph{Walk while calling with hands}. (a) using a sparse regularizer, (b) using a quadratic regularizer. The induced sparsity in the coefficients of action classifiers produces highly specialized poses. In this case, few poses are necessary to describe the arms (waving hand action), and more poses are needed to represent the walking action. Observing (a) we can speculate that most actors execute the \emph{waving hand} action using the right arm.}
+%\label{fig:poses_decay_WH}
+%%\vspace{-0.6cm}
+%\end{figure*}
+%
+%\begin{figure*}[t]
+%\begin{center}
+%\includegraphics[width=0.95\linewidth]{./Influence_C6_modelGS_H.pdf} \\ (a) \\
+%\includegraphics[width=0.95\linewidth]{./Influence_C6_model_H.pdf} \\ (b) \\
+%\end{center}
+%\caption{Influence of poses in activity \emph{Composed Activity 6}. (a) using a sparse regularizer, (b) using a quadratic regularizer. Comparing to Fig. \ref{fig:poses_decay_WH}, we can see that more poses influence this activity, which is expected since this activity is more complex than \emph{Walk while calling with hands}.}
+%\label{fig:poses_decay_C6}
+%%\vspace{-0.6cm}
+%\end{figure*}

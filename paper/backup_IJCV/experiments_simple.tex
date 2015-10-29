@@ -1,0 +1,153 @@
+%We report results on two publicly available datasets:
+%the MSR-Action3D \cite{WanLi2010} dataset for benchmarking recognition of simple actions,
+%and our Composable Activities Dataset introduced in \cite{Lillo2014}.
+%We next describe each dataset as well as some implementation details.
+
+While our model is aimed at the recognition of activities that can be composed by simpler actions,
+we experimentally verify that the model can also handle the case of simple action recognition.
+Towards this goal, we evaluate our algorithm on the MSR-Action3D dataset \cite{WanLi2010},
+which consists of 10 subjects performing 20 actions related to gaming in front of a TV.
+This dataset provides skeleton data (joint locations) and low resolution depth maps.
+
+During training, our hierarchical model needs 
+a global activity label as well as per-frame atomic action labels. However, the MSR-Action3D 
+dataset only includes the annotation of a single global action for each video. As a consequence, 
+we need to augment the annotations of this dataset to be compatible with our model. To achieve 
+this, we automatically augment the annotations as follows. At the activity level of our model, we 
+use the original action label provided in the dataset as our global activity
+label. Similarly, at the atomic action level of our model, 
+we annotate each video frame with this global action label. As a further adaptation, we swap to an
+\emph{idle} label all inactive frames. We select the frames annotated as \emph{idle} following a 
+simple heuristic. First, we annotate as 
+\emph{idle} the four body regions of the first frame of each video. Then, we search for all frames 
+in which the pose of each region closely resembles the corresponding pose in
+the first frame, labeling all these regions as \emph{idle} too. This simple heuristic works well to 
+identify \emph{idle}
+frames in this dataset, since subjects start the video
+with a resting position. Additionally, we filter out noisy \emph{idle} labels by 
+only keeping as such sets of more than 6 consecutives frames labeled as \emph{idle}. Finally, 
+we assign a complete region in a video as \emph{idle} if this label appears in more than 60\% of 
+the 
+frames.
+
+In our experiments, we use a total of 552 sequences.
+We omit 5 out of the 557 videos because they have missing joints in
+the last half of the sequence.
+We test our model on all 20 action categories using cross-subject validation,
+with subjects 1-3-5-7-9 for training and the rest for testing.
+This corresponds to the same experimental setting used in \cite{Wang2012}.
+In our evaluation, we use $K=100$ poses for each body region, for a total of 400 pose 
+dictionary entries.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}
+\centering
+%{\small
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Algorithm} & \textbf{Accuracy}\\
+\hline
+Ours  &  \textbf{92.4\%} \\
+\hline
+%J. Luo et al. \cite{luo2013group} & \textbf{96.7\%} \\
+%Y. Zhu et al. \cite{zhu2013fusing} & 94.3\% \\
+C. Wang et al.\cite{Wang2013} &    90.2\% \\
+Vemulapalli et al. \cite{vemulapalli2014human} & 89.5\% \\
+Lillo et al. \cite{Lillo2014} & 89.5\%\\
+Xia and Aggarwal \cite{Xia} & 89.3\% \\
+J. Wang et al. \cite{Wang2012} &   88.2\% \\
+
+\hline
+\end{tabular}
+%}
+\caption{Recognition accuracy of our approach in the MSR-Action3D dataset compared to other
+methods in the literature that also use the experimental setup in 
+\cite{Wang2012}. Our method improves state-of-the-art
+performance in this dataset.
+%We include methods that use
+%joint data only and evaluation using cross-subject using all 20 action categories.
+}
+%\vspace{-0.3cm}
+\label{tab:msr_st}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
+Table \ref{tab:msr_st} reports the overall recognition accuracy of our model
+in the MSR-Action3D dataset,
+as measured by the average of the diagonal of the normalized confusion matrix. Additionally,
+Table \ref{tab:msr_st} compares our results to alternative methods proposed in the literature
+that also use the training/testing setup proposed in \cite{Wang2012}.
+Under this experimental setting, our model improves the state-of-art accuracy
+in this dataset.
+
+%\JC{Alvaro: queda cojo pues finalmente solo se reporta el accuracy como todos
+%los otros modelos. Hay que conectar esto con algun resultado cuantitativo o
+%cualitativo que muestre las ventajas indicadas}
+In addition to the strong activity recognition performance, our model
+has also the advantage of generating a rich video interpretation in the form of
+detailed per-frame and per-body-region action annotations.
+In contrast, all competitive models only produce a coarse interpretation
+in the form of a global video label prediction. Section \ref{subsec:action_annotation} provides 
+quantitative and qualitative insights about the capabilities of our method to infer at each frame 
+the body regions executing the action.
+
+An important aspect of these results is that our model achieves
+this performance using a pose dictionary of only 100 entries per region.
+This compares favorably with the results reported in \cite{Wang2012}, \cite{Wang2013}, and 
+\cite{Xia},
+which use dictionaries with thousands of entries.
+Our reduced dictionary translates to more compact models that require
+less computation at the inference stage. 
+
+%Furthermore, our model does not require a previous 
+%temporal segmentation as \cite{Koppula2012} or \cite{Wei2013}, the 
+%inputs to our model are only the frame descriptors.
+
+%As we will see in Section \ref{subsec:sparse_reg}, using a larger pose dictionary does not produce 
+%necessarily better results in our model, as well as a huge increasing in $K$ will make the 
+%inference impractical since the computing time is proportional to $K^2$.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
+\begin{table}
+\centering
+%{\small
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Algorithm} & \textbf{GEO} & \textbf{GEO/MOV} & \textbf{GEO/MOV + NI} \\
+\hline
+Ours, QR  &  89.5\% & 90.6\% & \textbf{92.4\%} \\
+\hline
+\end{tabular}
+%}
+\caption{Recognition accuracy of our approach in MSR-Action3D using a quadratic regularizer 
+(QR) and different settings: i) Using only a geometric 
+descriptor (GEO), ii) Combining  a geometric and a motion descriptors (GEO/MOV), and iii) Adding a 
+mechanism to identify and discard non-informative poses (NI).}
+%\vspace{-0.3cm}
+\label{tab:msr}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\JC{Alvaro: mover a mas adelante, donde se explican los efectos indicados,
+%i.e., secciones 4.3 y 4.4.}
+Finally, Table \ref{tab:msr} reports the performance of our model
+under several settings. First, we report performance when
+the model uses a quadratic regularizer (QR)
+combined with the geometric descriptor described in Section 
+\ref{subsec:videorepresentation} (GEO). This corresponds to the setup used in 
+\cite{Lillo2014}. We also consider the case when we combine the geometric descriptor with the 
+motion 
+descriptor described in Section 
+\ref{subsec:videorepresentation} (GEO/MOV). Additionally, we consider the case when the model 
+includes the 
+proposed method to identify and discard non-informative (NI).
+We further discuss the effect of these settings in the following sections.
+
+%We report the overall recognition accuracy as measured by the average of the
+%diagonal of the normalized confusion matrix.
+%We specify in the experiments when the 
+%quadratic regularizer (\textbf{QR})
+%or sparse regularizer (\textbf{SR}) is applied, as well as if the descriptor
+%used is only geometric (\textbf{GEO}), or a fused descriptor including geometry
+%and motion (\textbf{GEO/MOV}). We also specify when the handling of
+%non-informative poses is applied (\textbf{NI}).
