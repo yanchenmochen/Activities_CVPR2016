@@ -1,0 +1,48 @@
+This is BibTeX, Version 0.99c (TeX Live 2009/Debian)
+The top-level auxiliary file: activities_CVPR2016.aux
+The style file: ieee.bst
+Database file #1: AsaReferences_no_url.bib
+Database file #2: references.bib
+Database file #3: library_niebles_no_url.bib
+Database file #4: ILReferences_no_url.bib
+You've used 3 entries,
+            2120 wiz_defined-function locations,
+            534 strings with 4657 characters,
+and the built_in function-call counts, 960 in all, are:
+= -- 79
+> -- 64
+< -- 0
++ -- 25
+- -- 22
+* -- 64
+:= -- 174
+add.period$ -- 9
+call.type$ -- 3
+change.case$ -- 20
+chr.to.int$ -- 0
+cite$ -- 3
+duplicate$ -- 38
+empty$ -- 74
+format.name$ -- 22
+if$ -- 192
+int.to.chr$ -- 0
+int.to.str$ -- 3
+missing$ -- 3
+newline$ -- 18
+num.names$ -- 6
+pop$ -- 28
+preamble$ -- 1
+purify$ -- 17
+quote$ -- 0
+skip$ -- 21
+stack$ -- 0
+substring$ -- 15
+swap$ -- 5
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 12
+warning$ -- 0
+while$ -- 6
+width$ -- 4
+write$ -- 32

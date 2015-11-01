@@ -6,24 +6,60 @@
 \end{center}
    \caption{Graphical representation of our discriminative hierarchical model for recognition of composable human activities.
 At the top level, activities are represented as compositions of atomic actions that are inferred at
-the intermedite level. These actions are in turn compositions of poses at the
-lower level, where pose dictionaries are learnt from data. Our model also learn
+the intermediate level. These actions are in turn compositions of poses at the
+lower level, where pose dictionaries are learned from data. Our model also learn
 temporal transitions between consecutive poses and actions. Best viewed in
 color.}
 \label{fig:overview}
 %\vspace{-0.4cm}
+
 \end{figure}
-Our model is organized according to a 3-level hierarchy, where each level represents semantic 
-information at a different level of abstraction. This allows us to provide semantic and 
-interpretable predictions of the body poses, actions, and activities that are present at each video 
-frame. We start by describing the input data and video representation used in our framework. We then 
-present the main details of our model as well as the learning and inference schemes.
-% We present a 3-level hierarchal model, where each level is semantically interpretable, and which output is useful annotated data of actions and poses  for all frames, as well as the overall activity of the videos.
-%First we present the video representation used as inputs to the model; then, the hierarchic model to address the jointly learning of classifiers for activities, actions and poses, presenting also the metodology to solve the model.
-\input{videoRepresentation}
-\input{hierarchicalModel}
+
+[INTRO] 
+We build our model on top of the one presented in \cite{Lillo2014}. We improve the model in terms of (1) adding flexibility to handle multiple types of action annotations, (2) incorporating multiple classifiers per semantic action, and (3) adding a \emph{garbage collector} of poses to avoid modeling noisy or non-informative poses. We start by briefly depicting the model presented in \cite{Lillo2014}.
+
+[CVPR 2014 MODEL] 
+The model has three hierarchies: poses, atomic actions, and activities. The human body is splitted into four fixed spatial regions, corresponding to overlapping joints for arms and legs. A geometric feature is computed in each frame. The model considers energy potentials for poses as linear classifiers applied to frame features, coded by a latent label $z_t$ that relates the region feature for frame $t$ to one of $K$ pose classifiers. For atomic actions, the model use the BoW (histogram) representation of labels $\+z$ for frames belonging to each action, in order to learn $A$ atomic action linear classifiers. The action label of a frame us denoted as $v_t$. Finally, for activities, the model use the BoW representation of actions in the video, to learn a multiclass linear classifier. Adding all energy terms, and including temporal transition terms, the energy equation of the model in \cite{Lillo2014} is 
+
+[EQUATIONS] 
+
+The model parameters are learned with a Latent Structural SVM formulation, iterating between searching the best assignments of poses $Z$ and the best classifiers given $Z$. 
+
+To relax the need of action annotations for each human region, we propose to use latent variables representing the assignment of actions to human body regions; to overcome the multimodal representations of actions, we allow the model to have multiple classifiers per semantic action; and to handle the noisy or non-informative poses (NI), we propose a \emph{garbage collector} approach where the model itself identifies a threshold for the scores of pose classifiers of every human region. We describe each contribution in the following.
+
+
+\subsection{Latent assignments of actions to human regions}
+
+Including latent variables into the model formulation is relatively straightforward, although there is two changes with respect to the original model. Firstly, the loss function $\Delta((y_i,V_i),(y,V))$ can no longer depend in the value of $V_i$, since it is now a latent variable. But, as we do know the time span of the actions in all videos, we can compute a list $A_t$ of possible actions for frame $t$, and transform the original loss function into
+\begin{equation}
+\Delta(y_i,(y,V)) = \lambda_y(y_i \ne y) + \lambda_v\frac{1}{T}\sum_{t=1}^T \delta(v_t \notin A_t)
+\end{equation}
+and use the same group of actions for each frame to impute the labels of actions and poses for each frame during the inference of latent variables. And secondly, the tricky part is how to get a good starting point for atomic actions, since as we now use two sets of latent variables there is a high chance to get sticked in a local minimum. We develop a general method to get a proper initialization, in the sense that the imputed actions satisfy that the action intervals for different actions do not overlap in the same region, and that at least one region is assigned to each action interval. Assume in this formulation that each region of the human body can only be assigned one action at a time, and also that poses for the same actions should be similar, we formulate the initial labeling as an Integer Linear Programming (ILP) problem. We define $v_{r,q}^m=1$ when the action interval $q$ appears in region $r$ in the video $m$, and $v_{r,q}^m=0$ otherwise. We assume we have pose labels $z_t$ for each frame, independent for each region. For an action interval $q$, we use the histogram of pose labels for each region in the action interval, defined for the video $m$ as $h_{r,q}^m$ . We can solve the problem of finding the correspondence between action intervals and regions in a formulation similar to $k$-means, using the structure of the problem as constraints in the labels. 
+\begin{equation}
+\begin{split}
+P1) \quad \min J= &\sum_{m=1}^M  \sum_{r=1}^R \sum_{q=1}^{Q_m}  v_{r,q}^m || h_{r,q}^m - \mu_{a_q}^r||_2^2 -\frac{1}{\lambda} v_{r,q}^m\\ 
+ \text{s. to} 
+\quad 
+& \sum_{r=1}^R v_{r,q}^m \ge 1 \\ 
+%& \sum_{q=1}^{Q_m} v_{r,q}^m \le t_m \\ 
+& v_{r,q_1}^m + v_{r,q_2}^m \le 1 \text{ if } q_1\cap q_2 \neq \emptyset \\  
+& v_{r,q}^m \in \{0,1\},~\forall m
+\end{split}
+\end{equation}
+ 
+$\mu_{a_q}^r$ are computed as the mean of the descriptors with the same action label within the same region. The general idea is to solve $P1$ iteratively as $k$-means,  finding the cluster centers for each region $r$, $\mu_{a}^r$ using the labels $v_{r,q}^m$, and then finding the best labeling given the cluster centers, solving an ILP problem.
+
+[IL: INCLUDE  FIGURE TO SHOW P1 GRAPHICALLY]
+
+\subsection{Representing semantic actions with multiple atomic sequences}
+
+As the poses and atomic actions in \cite{Lillo2014} model are shared, a single classifier is generally not enough to model multimodal representations, usual in more complex videos with different camera views or where the same action name refers to different actions depending on the context. We modify the original hierarchical model of \cite{Lillo2014} to include multiple linear classifiers per action. We create two new concepts: \textbf{semantic actions}, that refer to actions \emph{names} that compose an activity; and \textbf{atomic sequences}, that refers to the sequence of poses that conform an action. Several atomic sequences can be associated to a single semantic action, creating disjoint sets of atomic sequences, each set associated to a single semantic action.  The main idea is that the action annotations in the datasets are associated to semantic actions, whereas for each semantic action we learn several atomic sequence classifiers. With this formulation, we can handle the multimodal nature of semantic actions, covering the changes in motion, poses , or even changes in meaning of the action according to the context (e.g. the action ``open'' can be associated to open a can, open a door, etc.).
+
+\subsection{Towards meaningful poses: adding a \emph{garbage collector}} 
+ 
+The model in \cite{Lillo2014} uses all poses to feed action classifiers. Out intuition is that only a subset of poses in each video are really discriminative or informative for the actions performed, while there is plenty of poses that corresponds to noisy or non-informative ones.
+
+%\input{videoRepresentation}
+%\input{hierarchicalModel
 %\input{learning}
 \input{inference}
-
-
-
