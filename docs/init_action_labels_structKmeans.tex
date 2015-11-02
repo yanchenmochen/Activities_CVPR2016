@@ -59,8 +59,8 @@ The structure of the problem allow us to infer the following relations:
 \begin{itemize}
 \item Each action interval $q$ must appear at least one time in the video. The action label of the action interval $q$ is defined as $a_q$.
 \item Two overlapping action intervals can't appear in the same region.
-\item The maximum number of action intervals belonging to each region must be at last the number of non-overlapping actions in each video. This number is defined as $t_m$
-\item The maximum number of regions sharing the same action interval $q$ must be the difference between the total number of regions ($R$) and the number of time overlapping actions with $q$. This number is defined as $o_q^m$
+%\item The maximum number of action intervals belonging to each region must be at last the number of non-overlapping actions in each video. This number is defined as $t_m$ (redundant when including second item)
+%\item The maximum number of regions sharing the same action interval $q$ must be the difference between the total number of regions ($R$) and the number of time overlapping actions with $q$. This number is defined as $o_q^m$ (redundant when including second item)
 \end{itemize}
 We define $v_{r,q}^m=1$ when the action interval $q$ appears in region $r$ in the video $m$, and $v_{r,q}^m=0$ otherwise. We assume we have pose labels for each frame, independent for each region. For an action interval $q$, we use the histogram of pose labels for each region in the action interval, defined for the video $m$ as $h_{r,q}^m$ . We can solve the problem of finding the correspondence between action intervals and regions in a formulation similar to $k$-means, using the structure of the problem as constraints in the labels. 
 \begin{equation}
@@ -68,8 +68,8 @@ We define $v_{r,q}^m=1$ when the action interval $q$ appears in region $r$ in th
 P1) \quad \min J= &\sum_{m=1}^M  \sum_{r=1}^R \sum_{q=1}^{Q_m}  v_{r,q}^m || h_{r,q}^m - \mu_{a_q}^r||_2^2 -\frac{1}{\lambda} v_{r,q}^m\\ 
  \text{s. to} 
 \quad 
-& 1 \le \sum_{r=1}^R v_{r,q}^m \le o_q^m \\ 
-& \sum_{q=1}^{Q_m} v_{r,q}^m \le t_m \\ 
+& \sum_{r=1}^R v_{r,q}^m \ge 1 \\ 
+%& \sum_{q=1}^{Q_m} v_{r,q}^m \le t_m \\ 
 & v_{r,q_1}^m + v_{r,q_2}^m \le 1 \text{ if } q_1\cap q_2 \neq \emptyset \\  
 & v_{r,q}^m \in \{0,1\},~\forall m
 \end{split}
