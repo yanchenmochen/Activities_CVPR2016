@@ -5,44 +5,48 @@ Database file #1: AsaReferences_no_url.bib
 Database file #2: references.bib
 Database file #3: library_niebles_no_url.bib
 Database file #4: ILReferences_no_url.bib
-You've used 3 entries,
+Database file #5: ivan.bib
+Warning--there's a number but no series in Rohrbach2012
+Warning--empty journal in Yeung2015
+You've used 20 entries,
             2120 wiz_defined-function locations,
-            534 strings with 4657 characters,
-and the built_in function-call counts, 960 in all, are:
-= -- 79
-> -- 64
-< -- 0
-+ -- 25
-- -- 22
-* -- 64
-:= -- 174
-add.period$ -- 9
-call.type$ -- 3
-change.case$ -- 20
+            627 strings with 7351 characters,
+and the built_in function-call counts, 8653 in all, are:
+= -- 873
+> -- 395
+< -- 12
++ -- 154
+- -- 134
+* -- 563
+:= -- 1309
+add.period$ -- 68
+call.type$ -- 20
+change.case$ -- 127
 chr.to.int$ -- 0
-cite$ -- 3
-duplicate$ -- 38
-empty$ -- 74
-format.name$ -- 22
-if$ -- 192
+cite$ -- 22
+duplicate$ -- 376
+empty$ -- 679
+format.name$ -- 134
+if$ -- 1923
 int.to.chr$ -- 0
-int.to.str$ -- 3
-missing$ -- 3
-newline$ -- 18
-num.names$ -- 6
-pop$ -- 28
+int.to.str$ -- 20
+missing$ -- 20
+newline$ -- 103
+num.names$ -- 40
+pop$ -- 164
 preamble$ -- 1
-purify$ -- 17
+purify$ -- 107
 quote$ -- 0
-skip$ -- 21
+skip$ -- 301
 stack$ -- 0
-substring$ -- 15
-swap$ -- 5
-text.length$ -- 0
+substring$ -- 545
+swap$ -- 151
+text.length$ -- 12
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 12
-warning$ -- 0
-while$ -- 6
-width$ -- 4
-write$ -- 32
+type$ -- 80
+warning$ -- 2
+while$ -- 74
+width$ -- 22
+write$ -- 222
+(There were 2 warnings)

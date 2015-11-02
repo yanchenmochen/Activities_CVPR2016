@@ -1,15 +1,17 @@
-We validate the effectiveness of our proposed model by considering two experimental scenarios.
-First, we test the ability of our approach to discriminate simple actions on a
-benchmark dataset.
-Second, we test the performance of our model to recognize complex and
-composable human activities. Additionally, we also study the contribution of key components of our 
-model
+We validate the effectiveness of our proposed model by considering several experimental scenarios.
+First, we test the ability of our approach to learn the model classifiers using the latent actions formulation, in databases of composed activities and datasets of simple actions. 
+Second, we test the performance of our model when using multiple atomic sequence  classifiers per semantic action, testing in  simple and complex datasets. In every test, the comparison between the activation/deactivation of \emph{garbage colector} will be discussed.
+
+Additionally, we also study the contribution of key components of our model
 and their impact in recognition performance.
-In particular, we highlight the contribution of the extensions of our
-framework with respect to its preliminary version in \cite{Lillo2014}.
+In particular, we highlight the contribution of the extensions of the
+framework with respect to \cite{Lillo2014}.
+
+We tested our improvements in several datasets. In particular we use three datasets of composed actions (Composed Activities dataset \cite{Lillo2014}, Concurrent Actions dataset \cite{Wei2013}, and CAD120 dataset \cite{Koppula2012}), in addition to simple activities dataset like MSR-Action3D \cite{WanLi2010} and sub-JHMDB \cite{Jhuang2013}.
 
 \subsection{Recognition of simple actions}
 \label{subsec:exp_setup}
+
 %\input{experiments_simple}
 % Here we explain the databases, give implementation details, and all the extra info needed to understand the following sections.
 
