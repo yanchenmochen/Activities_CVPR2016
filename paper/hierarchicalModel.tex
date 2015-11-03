@@ -1,45 +1,61 @@
-\subsection{Improved hierarchical model}
+\subsection{Flexible hierarchical model}
  %
-[CVPR2014 MODEL SUMMARY] We start by briefly depicting the model presented in \cite{Lillo2014}.
-They model an activity using three hierarchical levels: poses, atomic actions, and activities.  The human body is splitted into four fixed spatial regions, corresponding to overlapping joints for arms and legs. A geometric feature is computed in each frame. The model considers energy potentials for poses as linear classifiers applied to frame features, coded by a latent label $z_t \in \{1,\dots,K\}$ that relates the region feature for frame $t$ to one of $K$ pose classifiers. In the mid-level of atomic actions, the model use as descriptor the BoW (histogram) representation of labels $Z$ for frames belonging to each action, in order to learn $A$ atomic action linear classifiers. The action label of a frame is denoted as $v_t \in \{1,\dots,A\}$. Finally, in the higher level of activities, the model use the BoW representation of actions in the video, to learn a multiclass linear classifier. Adding all energy terms, using for the moment $R=1$ regions for simplicity, and including temporal transition terms, the energy equation for video $D$ in \cite{Lillo2014} is 
+[CVPR2014 MODEL SUMMARY] In order to achieve or objectives, we build our model on top of the hierarchical model presented in \cite{Lillo2014}.
+The authors model an activity using three hierarchical levels: poses, atomic actions, and activities, using features extracted from 3D skeleton joints, splitting the human body into $R=4$ fixed spatial regions, corresponding to overlapping joints for arms and legs. It's a good sttr since the model considers energy potentials for poses as linear classifiers applied to frame features, selecting the pose classifier via a latent pose label $z_t \in \{1,\dots,K\}$. The pose modeling resembles Poselets [REF], In the mid-level of atomic actions, the model use as descriptor the BoW (histogram) representation of labels $Z$ for frames belonging to each action, in order to learn $A$ atomic action linear classifiers. The action label of a frame is denoted as $v_t \in \{1,\dots,A\}$. Finally, in the higher level of activities, the model use the BoW representation of actions labels $V$ of the video, to learn a multiclass linear classifier. Adding all energy terms, using $R=1$ for simplicity, and including temporal transition terms, the energy equation for video $D$ in \cite{Lillo2014} is 
 %
-\begin{equation}
+\begin{eqnarray}
 \label{eq:energy2014}
 \begin{split}
-E(D) = \left[ {\alpha_y}^\top h(V) + \sum_{a=1}^A {\beta_a}^\top h_a(Z) + \sum_{t=1}^T {w_{z_t}}^\top x_t \right.\\\left.+ {\gamma}^\top h(V^{-1},V) + {\eta}^\top h(Z^{-1},Z) \vphantom{ \sum_{a=1}^A} \right]
+E(D) =  {\alpha_y}^\top h(V) + \sum_{a=1}^A {\beta_a}^\top h_a(Z) + \sum_{t=1}^T {w_{z_t}}^\top x_t  \\+ {\gamma}^\top h(V^{-1},V) + {\eta}^\top h(Z^{-1},Z)
 \end{split}
-\end{equation}
+\end{eqnarray}
 %
-where $h(V)$ is the histogram of atomic action labels, $h_a(Z)$ the histogram of pose labels at those frames labeled with action $a$, and $h(V^{-1},V)$ and $h(Z^{-1},Z)$ represents histograms for action and pose transitions respectively. The main idea is that the energy score for the video using the correct activity must be higher than every other activity. As during inference the labels $Z$ and $V$ are unknown, they must be inferred along with the activity label. Thus, an interesting property of this model is the per-frame nature of the energy function. The authors in \cite{Lillo2014} test their model in their own Composable Activities dataset, which include rich action labels annotated independently for four human regions (arms and legs). To date, this is the only action dataset with this level of spatial annotations. Our work is oriented in making this model more flexible and general.
+where $h(V)$ is the histogram of atomic action labels, $h_a(Z)$ the histogram of pose labels at those frames labeled with action $a$, and $h(V^{-1},V)$ and $h(Z^{-1},Z)$ represents histograms for action and pose transitions respectively. The main idea is that the energy score for the video using the correct activity must be higher than every other activity. As during inference the labels $Z$ and $V$ are unknown, they must be inferred along with the activity label. Thus, an interesting property of this model is the per-frame nature of the energy function. The authors in \cite{Lillo2014} test their model in their own Composable Activities dataset, which include rich action labels annotated independently for four human regions (arms and legs). To date, this is the only action dataset with this level of spatial annotations. Our work take this model as an starting point to include flexibility... [CONTINUE]
 
 [NEW MODEL]
-We propose three improvements to the model to make it more practical and flexible: firstly, to relax the need of action annotations for each human region, we propose to use latent variables representing the assignment of actions to human body regions; secondly, to overcome the multimodal representations of actions, we model each action as a group of linear classifiers instead of using a single classifier per action; and last, to handle the noisy or non-informative poses (NI), we propose a \emph{garbage collector} approach where the model itself identifies a threshold for the scores of pose classifiers of every human region. We describe each contribution in the following paragraphs.
+%We propose three improvements to the model to make it more practical and flexible: firstly, to relax the need of action annotations for each human region, we propose to use latent variables representing the assignment of actions to human body regions; secondly, to overcome the multimodal representations of actions, we model each action as a group of linear classifiers instead of using a single classifier per action; and last, to handle the noisy or non-informative poses (NI), we propose a \emph{garbage collector} approach where the model itself identifies a threshold for the scores of pose classifiers of every human region. We describe each contribution in the following paragraphs.
 
-\paragraph{Latent assignments of actions to human regions}
+To include our insights about ... [CHAIN WITH INTRO], we think it is important to keep the high representative power of human regions in complex or concurrent actions, but without the extra weight of requiring expensive annotated data. We therefore propose modeling the action assignments to regions as latent variables during training, allowing the model to infer which human part execute the action without needing this kind of annotations in the training set. In this way, we advance from a simple detection problem to infer also \emph{how} the subject executes the action, important because [INTRO!]. Also, to construct a general model for shared actions, we need to be able to handle multimodal information, which is produced by actions with the same label but with different execution patterns, or by changes in representation of actions such as varying camera view. We handle this problem by augmenting the number of action classifiers, where each original action acts as a parent node of several non-overlapping child actions. Finally, as we are using local information, some frames could be noisy or representing an uncommon pose, not useful to build the pose models. We attack this issue by adding a garbage collector for poses, where only the most-informative poses are used by pose classifiers during learning. We describe these contributions in th following paragraphs.
 
-Including latent variables into the model formulation is relatively straightforward, although the main problem to solve is to get a proper initialization of the starting point for atomic actions, since there is a high chance to get sticked in a local minimum. We develop a method to get a proper initialization of action labels. We start defining action intervals, since we assume that the time span of each action is known. Then, we use structural information as non-overlap of actions in the same region, and constraining that at least one region must be assigned to each action interval. We also assume in this formulation that that poses for the same actions should be similar. We formulate the initial labeling as a binary Integer Linear Programming (ILP) problem. We define $v_{r,q}^m=1$ when the action interval $q$ appears in region $r$ in the video $m$, and $v_{r,q}^m=0$ otherwise. We assume we have pose labels $z_t$ for each frame, independent for each region. For an action interval $q$, we use the histogram of pose labels for each region in the action interval, defined for the video $m$ as $h_{r,q}^m$ . We can solve the problem of finding the correspondence between action intervals and regions in a formulation similar to $k$-means, using the structure of the problem as constraints in the labels. 
+\paragraph{[EDIT] Latent assignments of actions to human regions}
+
+Knowing the parts of the body involved in the actions is highly appealing. Suppose we have $M$ videos, each video annotated with $Q_m$ action intervals. Each action interval can be associated with any number of regions, from $1$ to all $R$ regions. For example,  a \emph{waving hand} action could be associated only with \emph{right\_arm}, while the action \emph{jogging} could be associated with the whole body. We want to learn the associations of actions and human parts for training videos, and we build these associations using latent variables. The main problem to solve is to how to get a proper initialization for actions, since there is a very high chance to get sticked in a local minimum far away of the optimum, producing bad results.
+
+Our first contribution is a method to get a proper initialization of fine-grained spatial action labels, knowing only the time span of the actions. Using the known action intervals,  we formulate the problem of action to region assignment as an optimization problem, constrained using structural information: the actions intervals must not overlap in the same region, and all the action intervals must be present at least in one region. We formulate this labeling problem as a binary Integer Linear Programming (ILP) problem. We define as $v_{r,q}^m=1$ when the action interval $q \in \{1,\dots,Q_m\}$ appears in region $r$ in the video $m$, and $v_{r,q}^m=0$ otherwise. We assume we have pose labels $z_{t,r}$ in each frame, independent for each region, learned via clustering the poses for all frames in all videos. For an action interval $q$, we use as descriptor the histogram of pose labels for each region in the action interval, defined for the video $m$ as $h_{r,q}^m$ . We can solve the problem of finding the correspondence between action intervals and regions in a formulation similar to $k$-means, using the structure of the problem as constraints in the labels, and using $\chi^2$ distance between the action interval descriptors and the cluster centers: 
 \begin{equation}
 \begin{split}
-P1) \quad \min J= &\sum_{m=1}^M  \sum_{r=1}^R \sum_{q=1}^{Q_m}  v_{r,q}^m || h_{r,q}^m - \mu_{a_q}^r||_2^2 -\frac{1}{\lambda} v_{r,q}^m\\ 
+P1) \quad \min_{v,\mu} &\sum_{m=1}^M  \sum_{r=1}^R \sum_{q=1}^{Q_m}  v_{r,q}^m d( h_{r,q}^m - \mu_{a_q}^r) -\frac{1}{\lambda} v_{r,q}^m\\ 
  \text{s. to} 
 \quad 
-& \sum_{r=1}^R v_{r,q}^m \ge 1 \\ 
+& \sum_{r=1}^R v_{r,q}^m \ge 1\text{, }\forall q\text{, }\forall m \\ 
 %& \sum_{q=1}^{Q_m} v_{r,q}^m \le t_m \\ 
-& v_{r,q_1}^m + v_{r,q_2}^m \le 1 \text{ if } q_1\cap q_2 \neq \emptyset \\  
-& v_{r,q}^m \in \{0,1\},~\forall m
+& v_{r,q_1}^m + v_{r,q_2}^m \le 1 \text{ if } q_1\cap q_2 \neq \emptyset \text{, }\forall r\text{, }\forall m\\  
+& v_{r,q}^m \in \{0,1\}\text{, }\forall q\text{, }\forall{r}\text{, }\forall m
 \end{split}
 \end{equation}
-$\mu_{a_q}^r$ are computed as the mean of the descriptors with the same action label within the same region. The general idea is to solve $P1$ iteratively as $k$-means,  finding the cluster centers for each region $r$, $\mu_{a}^r$ using the labels $v_{r,q}^m$, and then finding the best labeling given the cluster centers, solving an ILP problem. Note that the first term of $J$ is similat to a $k$-means model, while the second term resembles the objective function of \emph{self-paced} learning as in \cite{Kumar2010}, fostering to balance between assigning a single region to every action, towards assigning all possible regions to the action intervals when possible.  
+with
+\begin{equation}
+d( h_{r,q}^m - \mu_{a_q}^r) = \sum_{k=1}^K (h_{r,q}^m[k] - \mu_{a_q}^r[k])^2/(h_{r,q}^m[k] +\mu_{a_q}^r[k]).
+\end{equation}
+
+$\mu_{a_q}^r$ are computed as the mean of the descriptors with the same action label within the same region. We solve $P1$ iteratively as $k$-means,  finding the cluster centers for each region $r$, $\mu_{a}^r$ using the labels $v_{r,q}^m$, and then finding the best labeling given the cluster centers, solving an ILP problem. Note that the first term of the objective function is similar to a $k$-means model, while the second term resembles the objective function of \emph{self-paced} learning as in \cite{Kumar2010}, fostering to balance between assigning a single region to every action, towards assigning all possible regions to the action intervals when possible.  
 
 [IL: INCLUDE  FIGURE TO SHOW P1 GRAPHICALLY]
 
-\paragraph{Representing semantic actions with multiple atomic sequences}
+We describe the further changes in the hierarchical model of \cite{Lillo2014} in the learning and inference sections.
+  
+\paragraph{[EDIT] Representing semantic actions with multiple atomic sequences}.
 
-As the poses and atomic actions in \cite{Lillo2014} model are shared, a single classifier is generally not enough to model multimodal representations, usual complex videos. We modify the original hierarchical model of \cite{Lillo2014} to include multiple linear classifiers per action. We create two new concepts: \textbf{semantic actions}, that refer to actions \emph{names} that compose an activity; and \textbf{atomic sequences}, that refers to the sequence of poses that conform an action. Several atomic sequences can be associated to a single semantic action, creating disjoint sets of atomic sequences, each set associated to a single semantic action.  The main idea is that the action annotations in the datasets are associated to semantic actions, whereas for each semantic action we learn several atomic sequence classifiers. With this formulation, we can handle the multimodal nature of semantic actions, covering the changes in motion, poses , or even changes in meaning of the action according to the context (e.g. the semantic action ``open'' can be associated to opening a can, opening a door, etc.). 
+As the poses and atomic actions in \cite{Lillo2014} model are shared, a single classifier is generally not enough to model multimodal representations, that occur usually in  complex videos. We modify the original hierarchical model of \cite{Lillo2014} to include multiple linear classifiers per action. We create two new concepts: \textbf{semantic actions}, that refer to actions \emph{names} that compose an activity; and \textbf{atomic sequences}, that refers to the sequence of poses that conform an action. Several atomic sequences can be associated to a single semantic action, creating disjoint sets of atomic sequences, each set associated to a single semantic action.  The main idea is that the action annotations in the datasets are associated to semantic actions, whereas for each semantic action we learn several atomic sequence classifiers. With this formulation, we can handle the multimodal nature of semantic actions, covering the changes in motion, poses , or even changes in meaning of the action according to the context (e.g. the semantic action ``open'' can be associated to opening a can, opening a door, etc.). 
 
-We first describe the semantic actions for each video using a normalized BoW representation of the initial assignments of poses $Z$. Then, we find a suitable number of atomic sequence classifiers for each semantic action. Inspired by \cite{Raptis2012}, we use the \emph{Cattell's Scree test} using the eigenvalues $\lambda_i$ of the affinity matrix of the semantic action descriptors, using $\chi^2$ distance. For each semantic action $u \in \{1,\dots,U\}$ we find the number of atomic sequences $G_u$ as $G_u = \argmin_i \lambda_{i+1}^2 / (\sum_{j=1}^i \lambda_j) + c\cdot i$, with $c=2\cdot 10^{-3}$. Then we cluster the BoW descriptors using k-means, using a different number of clusters for each semantic action $u$ according to $G_u$.
+Inspired by \cite{Raptis2012}, we first use the \emph{Cattell's Scree test} for finding a suitable number of atomic sequence for every semantic action. Using the semantic action labels, we compute a descriptor for every interval using normalized histograms of pose labels. Then, for a particular semantic action $u$, we compute the the eigenvalues $\lambda_u$ of the affinity matrix of the semantic action descriptors, using $\chi^2$ distance. For each semantic action $u \in \{1,\dots,U\}$ we find the number of atomic sequences $G_u$ as $G_u = \argmin_i \lambda_{i+1}^2 / (\sum_{j=1}^i \lambda_j) + c\cdot i$, with $c=2\cdot 10^{-3}$. Finally, we cluster the descriptors corresponding to each semantic action using k-means, using a different number of clusters for each semantic action $u$ according to $G_u$. This approach generates non-overlapping atomic sequences, each associated to a single semantic action.
 
-In the model, action and pose levels are almost the same as in \cite{Lillo2014} excepting that now we have a higher number of atomic actions. For the  activity level, the original model computes the histogram of actions as a video descriptor; in our model, the histogram is constructed in two steps, first aggregating the action sequence labels that belongs to the same semantic action, and then using the counts as the histogram for the activity classifiers $\alpha$. 
+To transfer the new labels to the model, we define $u(v)$ as the function that given the atomic sequence label $v$, returns the corresponding semantic action label $u$. The energy for the activity level is then
+\begin{equation}
+E_{\text{activity}} =  \sum_{u=1}^U\sum_{t=1}^T \alpha_{y,u}\delta(u(v_t)=u)
+\end{equation}  
+
+For the action and pose labels the model remains unchanged. Using the new atomic sequences allows a richer representation for actions, while in he activity level, several atomic sequences will map to a single semantic action. This behavior resembles a max-pooling operation, where we will choose at inference the atomic sequences that best describe the performed actions in the video, keeping the semantics of the original labels. 
 
 \paragraph{Towards a better representation of poses: adding a garbage collector}
 
@@ -58,9 +74,8 @@ E_{\text{actions}} =  \sum_{t=1}^T \sum_{a=1}^A \sum_{k=1}^{K+1}  \beta_{a,k} \d
 \end{split}
 \end{equation}
 
+\begin{comment}
 Integrating all contribution detailed in previous sections, the model is written as:
-
-[IL: EQUATIONS ARE NOT UPDATED YET]
 Energy function:
 \begin{equation}
 E = E_{\text{activity}} + E_{\text{action}} + E_{\text{pose}}
@@ -68,11 +83,12 @@ E = E_{\text{activity}} + E_{\text{action}} + E_{\text{pose}}
 \end{equation}
 
 \begin{equation}
-E_{\text{pose}} = \sum_{r,t} {w^r_{z_{t,r}}}^\top x_{t,r} = \sum_{r,t,k} {w^r_{k,r}}^\top x_{t,r} \delta_{z_{t,r}}^k
+E_{\text{poses}}  = \sum_{t=1}^T \left[  {w_{z_t}}^\top x_{t}\delta(z_{t} \le  K) + \theta 
+\delta(z_{t}=K+1)\right] 
 \end{equation}
 
 \begin{equation}
-E_{\text{action}} = \sum_{r,a} {\beta^r_{a}}^\top h^{a,r}(Z, V) = \sum_{r,a,t,k} \beta^r_{a,k} \delta_{z_{t,r}}^k \delta_{v_{t,r}}^a
+E_{\text{actions}} =  \sum_{t=1}^T \sum_{a=1}^A \sum_{k=1}^{K+1}  \beta_{a,k} \delta(z_t = k) \delta(v_t = a).
 \end{equation}
 
 \begin{equation}
@@ -91,6 +107,6 @@ E_{\text{action transition}} = \sum_{r,a,a'}  \gamma^r_{a',a} \sum_{t} \delta_{v
 \begin{equation}
 E_{\text{pose transition}} =\sum_{r,k,k'}  \eta^r_{k',k}\sum_{t}\delta_{z_{t-1,r}}^{k'}\delta_{z_{t,r}}^{k}
 \end{equation}
-
+\end{comment}
 
 
