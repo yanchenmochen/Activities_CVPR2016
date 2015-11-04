@@ -1,20 +1,121 @@
-We validate the effectiveness of our proposed model by considering several experimental scenarios.
-First, we test the ability of our approach to learn the model classifiers using the latent actions formulation, in databases of composed activities and datasets of simple actions. 
-Second, we test the performance of our model when using multiple atomic sequence  classifiers per semantic action, testing in  simple and complex datasets. In every test, the comparison between the activation/deactivation of \emph{garbage colector} will be discussed.
+[GENERAL IDEA]
 
-Additionally, we also study the contribution of key components of our model
-and their impact in recognition performance.
-In particular, we highlight the contribution of the extensions of the
-framework with respect to \cite{Lillo2014}.
+What we want to show:
+\begin{itemize}
+\item Show tables of results that can be useful to compare the model.
+\item Show how the model is useful for videos of simple and composed actions, since now the level of annotations is similar.
+\item Show how the inference produces annotated data (poses, actions, etc). In particular, show in Composable Activities and Concurrent actions how the action compositions are handled by the model without post-processing.
+\item Show results in sub-JHMDB,showing how the model detects the action in the videos and also which part of the body performs the action (search for well-behaved videos). It could be interesting to show the annotated data over real RGB videos. 
+\item Show examples of poses (like poselets) and sequences of 3 or 5 poses for actions (Actionlets?)
+\end{itemize}
 
-We tested our improvements in several datasets. In particular we use three datasets of composed actions (Composed Activities dataset \cite{Lillo2014}, Concurrent Actions dataset \cite{Wei2013}, and CAD120 dataset \cite{Koppula2012}), in addition to simple activities dataset like MSR-Action3D \cite{WanLi2010} and sub-JHMDB \cite{Jhuang2013}.
-
-\subsection{Recognition of simple actions}
+\subsection{Raw results}
 \label{subsec:exp_setup}
+
+\paragraph{MSR-Action3D} Setup: subjects 1,3,5,7,9 for training, rest for testing, using all 20 action categories. This dataset is more as a proof of concept, that our model achieves near state-of-the-art accuracy in a standard dataset. In fact, omitting Tao el at. ICCV 2015 paper, we would achieve the best accuracy. BUT, they do not provide the rich annotations for testing data as our model. Also, we use the same initialization method to automatically annotate the actions in the dataset: the initialization method is integrated with the model and is independent of the dataset.
+
+\begin{table}
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Algorithm} & \textbf{Accuracy}\\
+\hline
+Ours, GEO+VEL, NI &  93.0\% \\
+Ours, GEO+VEL  & 91.2\% \\
+\hline
+%J. Luo et al. \cite{luo2013group} & \textbf{96.7\%} \\
+%Y. Zhu et al. \cite{zhu2013fusing} & 94.3\% \\
+L.Tao et al. \cite{Tao2015} & 93.6\% \\
+C. Wang et al.\cite{Wang2013} &    90.2\% \\
+Vemulapalli et al. \cite{vemulapalli2014human} & 89.5\% \\
+Lillo et al. \cite{Lillo2014} & 89.5\%\\
+\hline
+\end{tabular}
+\caption{Results in MSR-Action3D dataset. }
+\end{table}
+
+\paragraph{Composable Activities Dataset} In this dataset we show several results. (1) Comparing TRAJ descriptor (HOF over trajectory); (2) Compare the results using latent variables for action assignations to regions, with different initializations; (3) Show results of the annotations of the videos in inference. This has been shown in CVPR2014, but I think we have to show better figures, at least more attractive. The interesting part id that we achieve comparable results of out method using latent variables in actions, compared to using all annotations. We must include figures comparing the real annotations and the inferred annotations for training data, to show we are able to get the annotations only from data.
+
+\begin{table}
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Algorithm} & \textbf{Accuracy}\\
+\hline
+Ours, GEO+TRAJ &  91.1\% \\
+Ours, GEO+TRAJ, NI  & 91.8\% \\
+Ours, GEO+TRAJ, NI, VL-rand   & 46.3\% \\
+Ours, GEO+TRAJ, NI, VL-KM-M   & 54.8\% \\
+Ours, GEO+TRAJ, NI, VL-KM-ST   & 91.1\% \\
+\hline
+%J. Luo et al. \cite{luo2013group} & \textbf{96.7\%} \\
+%Y. Zhu et al. \cite{zhu2013fusing} & 94.3\% \\
+BoW, GEO+TRAJ & 74.1\%    \\
+HMM, GEO+TRAJ & 78.9\%  \\
+Cao et al. \cite{cao2015spatio} & 79.0\% \\
+H-BoW, GEO+TRAJ & 82.4\%   \\
+2-lev-HIER, GEO+TRAJ & 83.8\%  \\
+\hline
+\end{tabular}
+\caption{Results in Composable Activities dataset. }
+\end{table}
+
+\paragraph{Concurrent Action dataset} This dataset has 61 videos, some of them are very long, and most are short. The videos has a variable number of actions. The skeleton data and action annotations are provided. To apply the model we first cluster the data using the action labels for each video, using binary vectors where 1 indicate the action is present in the video, and 0 that the action is not present. We apply hierarchical clustering using euclidean distance, and find that using 7 clusters is a good fit. These clusters represents activities, and we first find a good initialization for action labeling in four regions. For testing, we only use the action labeling, using the same evaluation setup as in \cite{Wei2013}: a detected action interval is taken as correct if the overlapping length of the detected interval and the ground truth interval is larger 60\% than their union length or the detected interval is totally covered by the ground truth interval. The training/testing split is 50/50, chosen randomly, the same as in \cite{Wei2013}.
+
+We want to show using this dataset that the latent formulation achieve good recognition performance with respect to the model that uses this dataset. We can show also new annotations in this dataset, corresponding to the regions that are annotated with the actions. Our model gives a point in the precision/recall curve, since our model has no threshold or parameter that allows to adjust the recall, and in the  inference the labeling that maximizes the energy of the video is chosen. For this reason, we compare with \cite{Wei2013} using the same recall level.
+
+\begin{table}
+\centering
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Algorithm} & \textbf{Precision} & \textbf{Recall}\\
+\hline
+Ours, GEO+VEL, NI, VL-KM-ST &  92.3\% & 0.81\% \\
+\hline
+Wei et al. \cite{Wei2013} & 85.0\% & 0.81\% \\
+\hline
+\end{tabular}
+\caption{Results in Concurrent Action dataset. }
+\end{table}
+  
+ \paragraph{sub-JHMDB} In this dataset, we use the annotated joints provided to build our geometric descriptor. Only 15 joints per frame are annotated, and the coordinates of the joins are in 2D image coordinates. We first translate the 15 joints into 20 joints, and also create a \emph{pseudo} 3D data by adding a $z=0$ coordinate to the joints, adding $d$ to the joints of wrists and knees, and subtracting $d$ for elbows, to create a 3D skeleton suitable to our model. AS RGB videos are available, we compute the TRAJ feature as in Composble Acivities Dataset (explain better).
+
+In this dataset is clear tee benefits of all the components of the model: as we only have a single action label per video, we use the initialization of videos to get a better representation of the actions in the videos. As this dataset is from videos \emph{on the wild}, the camera view varies from video to video, making this dataset specially suitable to our algorithm of multiple classifiers per semantic action. Finally, the same as the rest of datasets, including the garbage collector math in the model allows to get a more discriminative model as it feeds the pose classifiers only with most informative poses. For a fair comparison, we compare our method with works that used the ground truth joints. We show in the results the mean accuracy over three splits, provided in the dataset.
+
+\begin{table}
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Algorithm} & \textbf{Accuracy}\\
+\hline
+Ours, GEO+TRAJ & 70.6\%\\
+Ours, GEO+TRAJ, NI & 72.7\% \\
+Ours, GEO + TRAJ, MUL & 75.3\%\\
+Ours, GEO+TRAJ, NI, VL-KM-ST, MUL &  77.5\% \\
+\hline
+Huang et al. \cite{Jhuang2013} & 75.6\% \\
+Ch\'eron et al. \cite{Cheron2015} & 72.5\%\\
+\hline
+\end{tabular}
+\caption{Results in sub-JHMDB dataset. }
+\end{table}
+
+\subsection{Figures}
+The list of figures should include:
+\begin{itemize}
+\item A figure showing the recognition and mid-level labels of Composable Activities, using RGB videos
+\item Comparison of action annotations, real v/s inferred in training set, showing we can recover (almost) the original annotations.
+\item Show a figure similar to Concurrent Actions paper, with a timeline showing the actions in color. We can show that our inference is more stable than proposed in that paper, and it is visually more similar to the ground truth than the other methods.
+\item Show a figure for sub-JHMDB dataset, where we can detect temporally and spatially the action without annotations in the training set.
+\item Show Composable Activities and sub-JHMDB  the most representative poses and actions.
+\end{itemize}
+
+\subsection{Notes}
+I'm testing in JHMDB dataset, hopefully we will have results on Thursday.
 
 %\input{experiments_simple}
 % Here we explain the databases, give implementation details, and all the extra info needed to understand the following sections.
-
+\begin{comment}
 \subsection{Recognition of composable activities}
 \label{subsec:experiments_summary}
 %\input{experiments_composable}
@@ -26,13 +127,15 @@ We tested our improvements in several datasets. In particular we use three datas
 \label{subsec:exp_vlatent}
 %\input{experiments_motion}
 
-\subsection{Impact of handling non-informative poses}
-\label{subsec:exp_non_info_handling}
-%\input{experiments_non_info_handling}
-
 \subsection{Impact of using multiple classifiers per semantic action}
 \label{subsec:exp_multiple}
 %\input{experiments_sparse_reg}
+
+\subsection{Impact of handling non-informative poses}
+\label{subsec:exp_non_info_handling}
+%\input{experiments_non_info_handling}
+\end{comment}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%555
