@@ -1,39 +1,67 @@
 There is a large amount of work on human activity recognition in the computer
-vision community \todo{Cite surveys}. 
+vision community \cite{Aggarwal2011,Poppe2010}. 
 In particular, we focus on the problem of recognizing human actions and
-activities from videos using pose-based representations.
+activities from videos using pose-based representations and review in the
+following some of the most relevant previuos work.
 
-\paragraph{Problem} Pose-based action recognition from color videos, and
-from depth videos.
-Some tackle the problem of jointly recognizing actions and poses in videos
-\cite{Nie2015} and in still images \cite{Yao2010}.
-Skeletons in a Lie Group \cite{Vemulapalli2014}
+The idea of using human body poses and configurations as an important
+cue for recognizing human actions has been explored recurrently
+\cite{Feng2002, Tao2015}, as poses provide strong cues on the actions
+being performed.
+Initially, most research focused on pose-based action recognition in color
+videos \cite{Feng2002, Thurau2008}.
+But due to development of pose-estimation
+methods on depth images\cite{Shotton:EtAl:11}, there has been a recent interest in
+pose-based action recognition from RGBD videos
+\cite{Escorcia2012, Hu2015, Tao2015, Vemulapalli2014}.
+\todo[inline]{Cite datasets instead here?}
+Furthermore, some methods have tackled the problem of jointly recognizing
+actions and poses in videos \cite{Nie2015} and in still images \cite{Yao2010},
+with the hope to create positive feeback by solving both tasks simoultaneously.
 
-\paragraph{Scope} From simple actions to concurrent and composable activities.
-Dense annotation of actions \cite{Yeung2015}.
-Fine-grained cooking dataset \cite{Rohrbach2012}.
+One of the most influential pose-based representations in the literature
+is Poselets, which was introduced by Bourdev and Malik in \cite{Bourdev2009}.
+This pose-based representation relies on the construction of a large set of
+frequently occurring poses, which is used to represent the pose space in a
+quantized, compact and discriminative manner.
+This representation has been extended to action recognition in still
+images \cite{maji2011action},
+as well as in videos \cite{Tao2015, Wang2014,Zanfir2013}.
 
-\paragraph{Descriptors} Fusing poses with other descriptors. P-CNN \cite{Cheron2015}
-fuses pose-centered CNN features extracted from optical flow and color.
-Fusion of color and depth features: Heterogeneous features \cite{Hu2015};
-Bilinear heterogeneous information machine \cite{Kong2015};
+%\paragraph{Representation} Poselets.
+%Moving Poselets \cite{Tao2015}.
+%Dynamic Poselets \cite{Wang2014}.
+%Moving Pose, a descriptor for action recognition \cite{Zanfir2013}
 
-\paragraph{Representation} Poselets.
-Moving Poselets \cite{Tao2015}.
-Dynamic Poselets \cite{Wang2014}.
-Moving Pose, a descriptor for action recognition \cite{Zanfir2013}
+Researchers have also explored the idea of fusing pose-based cues with
+other types of visual descriptors. For example, Cheron \etal \cite{Cheron2015}
+introduces P-CNN as a framework for incorporating pose-centered
+CNN features extracted from optical flow and color.
+In the case of RGBD videos, researchers have proposed the fusion
+of depth and color based features \cite{Hu2015, Kong2015}.
+In general, the use of multiple types of features help disambiguate some
+of the most similar actions.
 
-\paragraph{Models} Latent variable models for action recognition.
-Latent models for activity recognition \cite{Hu2014}.
+Also relevant to our framework are hierarchical models for action
+recognition. In particular, the use of latent variables as an intermediary
+representation in the internal layers of the model can be a powerful
+tool to build discriminative models and meaningful representations
+\cite{Hu2014, Wang2008}. An alternative is to learn hierarchical models
+based on recurrent neural networks \cite{YongDu2015}, but they tend to lack
+interpretabily in their internal layers.
 
-\paragraph{Models} Neural Networks. RNN \cite{YongDu2015}
+%\paragraph{Models} Latent variable models for action recognition.
+%Latent models for activity recognition \cite{Hu2014}.
+%\paragraph{Models} Neural Networks. RNN \cite{YongDu2015}
 
-
-
-
-
-
-
-
-
+While most of previous work has focused on recognizing single and isolated
+simple actions, in this paper we are interested in the recognition
+of complex, composable \cite{Lillo2014} and concurrent \cite{Wei2013} actions
+and activities. In this setting, a person may be executing multiple actions
+simultaneously, or in sequence, instead of performing each action in isolation.
+An example of these is the earlier work of Ramanan and Forsyth \cite{Ramanan2003},
+with more recent approaches by Yeung \etal \cite{Yeung2015} and
+Wei \etal \cite{Wei2013}.
+Another recent trend aims at fine-grained detection of actions performed in sequence
+such as those in a cooking scenario \cite{Rohrbach2012, Lan2015}.
 
