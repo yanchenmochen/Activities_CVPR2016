@@ -2,7 +2,6 @@
 \begin{center}
 \fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
 %\includegraphics[width=0.99\linewidth]{./fig_graphical_hierarchic_model.pdf}
-%\vspace{-1.3cm}
 \end{center}
    \caption{Graphical representation of our discriminative hierarchical model for recognition of composable human activities.
 At the top level, activities are represented as compositions of atomic actions that are inferred at
@@ -11,13 +10,72 @@ lower level, where pose dictionaries are learned from data. Our model also learn
 temporal transitions between consecutive poses and actions. Best viewed in
 color.}
 \label{fig:overview}
-%\vspace{-0.4cm}
 
 \end{figure}
 
-%We build our model on top of the one presented in \cite{Lillo2014}. We improve that model in three ways: (1) adding flexibility to handle multiple types of action annotations, (2) incorporating multiple classifiers for every action instead of a single classifier, and (3) adding a \emph{garbage collector} of poses to avoid modeling noisy or non-informative poses. 
 
-Our model for complex action recognition follows a hierarchical compositional approach based on pose and mid-level representations, such as \cite{Lillo2014} or \cite{Tao2015} .  As a distinguishing idea from previous works, we include a mechanism to infer not only the global activity label of the videos, but also recover quality temporal and spatial annotations of actions and poses. To this end, we explore three main ideas: first, we create method to automatically infer mid-level annotations for localize actions spatially. Then, going towards general action recognition, we describe a method to handle multiple classifiers for the same action, fostering to create action models with better representation power in hierarchical setups, where usually low and mid-level components are shared throughout high level activities. Finally, to complement the generalization of the model we aim to build discriminative low level classifiers. When using pose dictionaries, there is a high chance that noisy and non-informative poses are present when training low-level (pose) classifiers. In models like  \cite{Tao2015}, where  video descriptors use aggregated data of the complete video, the effect of non-informative poses is mitigated compared to a frame-based model, even when the latter provide richer interpretations. We build our model in a general hierarchical activity model based on BoW representations, although the approach can be extended to hierarchical models in general. 
+In this section, we introduce our model for pose-based recognition of complex
+human actions. Our goal is to give the model the capability of annotating input
+videos with the actions being performed at test time. In particular, we are
+interested in automatically identifying the parts of the body that are involved
+in each action (spatial localization), as well as the temporal span of each
+action (temporal localization). Since we are interested in concurrent and
+composable activities, we would also like to encode multiple levels of
+abstraction, so that we can encode poses, actions and their compositions.
+Therefore, we develop a hierarchical compositional framework for modeling and
+recognizing complex human actions.
+
+One of the key contributions of our model is its capability of spatially
+localizing the body regions that are involved with the execution of each
+activity, \emph{both at training and testing time}. This is, our training
+process does not require careful spatial annotation and localization of
+actions in the training set. Instead, our model can automatically
+discover these spatial body regions that are relevant to each action
+from temporal annotations of actions alone. In the following, we introduce
+the components of our model and the training process that achieves this goal.
+
+\subsection{Hierarchical Activity Model for Weakly Supervised Discovery of
+Relevant Moving Poselets}
+TITLE IS A PLACEHOLDER
+
+\paragraph{Training}
+
+\paragraph{Inference}
+
+\subsection{Capturing large action variabilities with a Mixture of Action
+Classifiers}
+TITLE IS A PLACEHOLDER
+
+Multiple action classifiers
+
+\subsection{Robustness to irrelevant, non-discrimiantive, or noisy poses}
+TITLE IS A PLACEHOLDER
+
+Garbage collector.
+
+
+\todo[inline]{El texto que sigue es el original de ivan.}
+
+Our model for complex action recognition follows a hierarchical compositional
+approach based on pose and mid-level representations, such as \cite{Lillo2014}
+or \cite{Tao2015} .  As a distinguishing idea from previous works, we include a
+mechanism to infer not only the global activity label of the videos, but also
+recover quality temporal and spatial annotations of actions and poses. To this
+end, we explore three main ideas: first, we create method to automatically
+infer mid-level annotations for localize actions spatially. Then, going towards
+general action recognition, we describe a method to handle multiple classifiers
+for the same action, fostering to create action models with better
+representation power in hierarchical setups, where usually low and mid-level
+components are shared throughout high level activities. Finally, to complement
+the generalization of the model we aim to build discriminative low level
+classifiers. When using pose dictionaries, there is a high chance that noisy
+and non-informative poses are present when training low-level (pose)
+classifiers. In models like  \cite{Tao2015}, where  video descriptors use
+aggregated data of the complete video, the effect of non-informative poses is
+mitigated compared to a frame-based model, even when the latter provide richer
+interpretations. We build our model in a general hierarchical activity model
+based on BoW representations, although the approach can be extended to
+hierarchical models in general.
 
 \input{hierarchicalModel}
 
