@@ -1,7 +1,91 @@
-Based on the a paper of hierarchical modeling of complex actions, we add four modifications:
+Human action recognition in video is a key technology for the development of a
+wide variety of applications, such as surveillance, human-computer interaction,
+and video annotation, among others. Consequently, it has received wide attention
+in the computer vision community with a strong focus on recognition of atomic
+actions using short video sequences
+\cite{Aggarwal2011,vishwakarma2013survey,weinland2011survey}. As the area
+evolves, recently, there has been an increasing interest to develop more
+flexible models that are able to operate on longer video sequences featuring
+multiple concurrent or sequential actions, which we refer to as
+\textit{complex actions}. Furthermore, in order to facilitate tasks such as
+video tagging or retrieval, it is also highly appealing to provide these models
+with capabilities to identify the spatial and temporal span of each relevant
+action. As an example, Figure \ref{fig:frontfigure} shows a wishful scenario,
+where an input video, featuring a complex action, has been automatically
+provided with the set of labels, as well as, the corresponding temporal and
+spatial span, of its main atomic actions.
+
+The emergence of cost-effective RGB-D cameras \cite{} has been an important step
+to fulfill the previous scenario. These sensors have provided a reliable source
+to obtain 3D joint positions of the human skeleton. As it has been noticed long
+ago \cite{Johansson73}, this type of data results highly informative to
+discriminate among human actions. Furthermore, recent studies have
+highlighted the relevance of joints position information to identify body poses
+\cite{Jhuang2013,Wang2013}. We believe that the hierarchical and compositional
+relations among joint positions, body poses, and actions, help to understand the
+recent success of models that exploit these relations to achieve action
+recognition.
+
+In this work, we present a new approach to recognize
+complex human actions using RGB-D data. As a distinguishing feature,
+given a video featuring a complex action, the
+proposed method is able to identify not only the complex action occurring in the
+video, but also the temporal and spatial extend of the corresponding atomic
+actions. In particular, we focus on actions that can be characterized by the
+body motions of a single actor, such as running, drinking, or eating. This
+allows us to test our approach using several benchmark datasets.
+
+Our model follows previous hierarchical compositional approaches based on Bag
+of Words (BoWs) representations, such as \cite{Wang2013, Lillo2014,
+de la torre,Tao2015}.
+Briefly, these models learn local dictionaries that capture
+appearance and motion patterns of different body parts. Following
+\cite{Tao2015}, we refer to these local patterns as moving poselets. These
+dictionaries are then used to construct BoW representations for the training
+videos, that in turn are used to learn action classifiers. Similarly to
+\cite{Lillo2014, Tao2015}, we formulate learning as an energy minimization
+problem, where structural hierarchical relations are modeled by sub-energy
+terms that constraint compositions among
+moving poselets and actions, as well as, their spatial and temporal relations
+\cite{Lillo2014}.
+
+As a distinguishing feature, our model innovate with respect to previous work by
+infering not only at test, but also at training time, the action labels of each
+detected moving poselet. To achieve this, we introduce a novel formulation based
+on a structural latent SVM model \cite{} and a initialization method based on
+self-pace learnining \cite{}. Furthermore, we extend the local dictionary
+learning process to the level of atomic actions by learning for each action a
+set of classifiers that are able to capture relevant variations in the execution
+of each action. We refer to these action modes as actionlets \cite{}. Finally,
+given that we are dealing with long videos with potential idle temporal and
+spatial parts, we include a while previous works need to associate all body
+poses in all video frames to one of the available atomic actions, we now include
+a new mechanism that identifies and discards non-informative frames.
+
+Consequently, this work makes the following main contributions:
+
 \begin{itemize}
-\item Add motion cues in addition to the basal geometric  features
-\item Latent assignments of actions into human parts
-\item Use multiple classifiers per semantic action
-\item Using more regions than the other paper.
+
+\item Moving poselets: our model includes a mechanism to infer not only at
+test, but also at training time ...yara yara using an efficient feature
+learning scheme.
+
+\item Actionlets: our model includes a mechanism to model
+
+\item Garbage collector: our model includes a mechanism that
+selectively filter-out noisy and irrelevant spatial and temporal areas of the
+input videos.
+
+ \item Empirical evidence indicating that the combination of the previous
+contributions result in a more informative and accurate model with
+respect to previos state-of-the-art approaches.
+
 \end{itemize}
+
+The rest of the paper is organized as follows:
+Section \ref{sec:related_work} reviews related work;
+Section \ref{sec:model} describes the proposed method;
+Section \ref{sec:experiments}  presents qualitative and quantitative experiments
+on standard benchmark datasets;
+and Section \ref{sec:conclusions} presents concluding remarks and future research
+directions.
