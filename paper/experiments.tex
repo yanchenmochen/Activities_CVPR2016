@@ -43,6 +43,7 @@ We note that our model achieves comparable performance with respect
 to the state-of-the-art methods for simple action recognition.
 
 \begin{table}
+\footnotesize
 \centering
 \begin{tabular}{|l|c|}
 \hline
@@ -127,6 +128,7 @@ dataset at that recall level.
 
 
 \begin{table}
+\footnotesize
 \centering
 \begin{tabular}{|l|c|c|}
 \hline
@@ -158,25 +160,26 @@ and regions that are involved in each atomic actions.
 
 
 \begin{table}
+\footnotesize
 \centering
 \begin{tabular}{|l|c|}
 \hline
 \textbf{Algorithm} & \textbf{Accuracy}\\
 \hline
-Our model, w/ spatial action labels &  91.8\% \\
-Our model, w/o spatial action labels (VL) & 91.1\%\\
+Our model, with spatial supervision &  91.8\% \\
+Our model, no spatial supervision (V Latent) & 91.1\%\\
 %Ours, GEO+TRAJ &  91.1\% \\
 %Ours, GEO+TRAJ, NI  & 91.8\% \\
 %Ours, GEO+TRAJ, NI, VL-KM-ST   & 91.1\% \\
 \hline
 %J. Luo et al. \cite{luo2013group} & \textbf{96.7\%} \\
 %Y. Zhu et al. \cite{zhu2013fusing} & 94.3\% \\
-BoW & 74.1\%    \\
-HMM & 78.9\%  \\
+Lillo \etal \cite{Lillo2014} & 85.7\% \\
+%BoW & 74.1\%    \\
+%HMM & 78.9\%  \\
 Cao et al. \cite{cao2015spatio} & 79.0\% \\
-H-BoW & 82.4\%   \\
-2-lev-HIER & 83.8\%  \\
-Lillo et al. \cite{Lillo2014} & 85.7\% \\
+%H-BoW & 82.4\%   \\
+%2-lev-HIER & 83.8\%  \\
 \hline
 \end{tabular}
 \caption{Results in Composable Activities dataset. }
@@ -189,6 +192,7 @@ Lillo et al. \cite{Lillo2014} & 85.7\% \\
 In this dataset is clear tee benefits of all the components of the model: as we only have a single action label per video, we use the initialization of videos to get a better representation of the actions in the videos. As this dataset is from videos \emph{on the wild}, the camera view varies from video to video, making this dataset specially suitable to our algorithm of multiple classifiers per semantic action. Finally, the same as the rest of datasets, including the garbage collector math in the model allows to get a more discriminative model as it feeds the pose classifiers only with most informative poses. For a fair comparison, we compare our method with works that used the ground truth joints. We show in the results the mean accuracy over three splits, provided in the dataset.
 
 \begin{table}
+\footnotesize
 \centering
 \begin{tabular}{|l|c|}
 \hline
@@ -211,6 +215,7 @@ results.
 
 
 \begin{table}
+\footnotesize
 \centering
 \begin{tabular}{|l|c|c|}
 \hline
@@ -238,6 +243,7 @@ Table \ref{tab:components} summarizes our experimental results with different
 versions of our model.
 
 \begin{table}
+\footnotesize
 \centering
 \begin{tabular}{|l|c|}
 \hline
@@ -246,7 +252,7 @@ versions of our model.
 Base Model & 70.6\%\\
 Base Model + GC & 72.7\% \\
 Base Model + Actionlets & 75.3\%\\
-Our Full Model (Actionlets + GC + Latent) &  77.5\% \\
+Our full model (Actionlets + GC + V Latent) &  77.5\% \\
 \hline
 \end{tabular}
 \caption{Analysis of contribution to recognition performance from
@@ -254,13 +260,11 @@ each model component in the sub-JHMDB dataset.}
 \label{tab:components}
 \end{table}
 
-
-
-
 Table \ref{tab:initialization} reports model accuracy under different initialization
 schemes.
 
 \begin{table}
+\footnotesize
 \centering
 \begin{tabular}{|l|c|}
 \hline
