@@ -1,9 +1,10 @@
 In this section, we present experimental results to study the performance
 of our model in the task of complex action recognition. Our experimental
 validation focuses on measuring two aspects of our model.
-First, we measure the action classification accuracy on
-several complex action recognition benchmarks.
-Second, we validate the accuracy of the spatio-temporal atomic action
+First, we measure action classification accuracy on
+several action recognition benchmarks.
+Second, we validate the performance of our model at the
+task of spatio-temporal atomic action
 annotation of human body regions that are involved in performing the complex
 action.
 
@@ -14,8 +15,8 @@ action.
 %to the semantic global labels. 
 
 %\subsection{Experimental Setup}
-\paragraph{Datasets:}
-We evaluate our method on four action recognition benchmarks:
+In the following experiments, we evaluate our method on four action recognition
+benchmarks:
 the MSR-Action3D dataset \cite{WanLi2010},
 Concurrent Actions dataset \cite{Wei2013},
 Composable Activities Dataset \cite{Lillo2014}, and sub-JHMDB
@@ -26,10 +27,11 @@ Composable Activities Dataset \cite{Lillo2014}, and sub-JHMDB
 
 As a first experiment,
 we evaluate the performance of our model on the task of simple and
-isolated action recognition in the  MSR-Action3D dataset \cite{WanLi2010}.
+isolated human action recognition in the  MSR-Action3D dataset
+\cite{WanLi2010}.
 Note that although our model is tailored at recognition of complex human
 actions, this experiment verifies the performance of our model in the
-simpler scenario of atomic action classification.
+simpler scenario of isolated atomic action classification.
 
 The MSR-Action3D dataset provides depth videos and estimated body poses
 for isolated actors in pre-trimmed videos performing actions from 20
@@ -107,8 +109,9 @@ The resulting groupings are used as complex actions labels in the training
 videos of this dataset.
 
 Note that at inference time, our model outputs a single labeling per video,
-which corresponds to the action labeling that maximizes the energy of our
-model. Since there are no thresholds to adjust, our model produces a single
+which corresponds to the atomic action labeling that maximizes the energy of
+our model.
+Since there are no thresholds to adjust, our model produces a single
 precision-recall measurement as reported in Table \ref{tab:concurrent}.
 We observe that our model outperforms the state-of-the-art method in this
 dataset at that recall level.
@@ -150,13 +153,23 @@ classification of complex and composable actions.
 For this purpose, we use the Composable Activities dataset \cite{Lillo2014},
 which provides 693 videos of 14 subjects performing 16 composable activities.
 Each activity is formed as a spatio-temporal composition of atomic actions.
-The dataset provides a total of 26 atomic actions that are shared accross
+The dataset provides a total of 26 atomic actions that are shared across
 activities.
 
-In particular, it is interesting to note that in spite of using less
+Table \ref{tab:composable} summarizes our experimental results.
+We report activity recognition accuracy for two versions of our
+model: one trained with spatial supervision that indicates which
+body regions are involved in each action, and another with
+no spatial supervision where no body regions are annotated and $V$
+is treated as a latent variable.
+We observe that both models achieve comparable performance, which
+indicates that our weakly supervised model can recover some of the information
+that is missing and still perform well at the activity catergorization task.
+It is also interesting to note that in spite of using less
 supervision at training time, our method outperforms the state-of-the-art
-methodologies that are trained with full spatial supervision of the body parts
-and regions that are involved in each atomic actions.
+methodologies that are trained with full spatial supervision.
+% of the body parts
+%and regions that are involved in each atomic actions.
 
 
 \begin{table}
@@ -167,7 +180,7 @@ and regions that are involved in each atomic actions.
 \textbf{Algorithm} & \textbf{Accuracy}\\
 \hline
 Our model, with spatial supervision &  91.8\% \\
-Our model, no spatial supervision (V Latent) & 91.1\%\\
+Our model, no spatial supervision ($V$ Latent) & 91.1\%\\
 %Ours, GEO+TRAJ &  91.1\% \\
 %Ours, GEO+TRAJ, NI  & 91.8\% \\
 %Ours, GEO+TRAJ, NI, VL-KM-ST   & 91.1\% \\
@@ -183,6 +196,7 @@ Cao et al. \cite{cao2015spatio} & 79.0\% \\
 \hline
 \end{tabular}
 \caption{Results in Composable Activities dataset. }
+\label{tab:composable}
 \end{table}
  
 \subsection{Action Recognition in RGB Videos}
@@ -252,7 +266,7 @@ versions of our model.
 Base Model & 70.6\%\\
 Base Model + GC & 72.7\% \\
 Base Model + Actionlets & 75.3\%\\
-Our full model (Actionlets + GC + V Latent) &  77.5\% \\
+Our full model (Actionlets + GC + $V$ Latent) &  77.5\% \\
 \hline
 \end{tabular}
 \caption{Analysis of contribution to recognition performance from
