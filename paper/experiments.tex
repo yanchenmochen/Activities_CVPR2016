@@ -44,7 +44,7 @@ by our model and other competing methods in Table \ref{tab:msr3d}.
 We note that our model achieves comparable performance with respect
 to the state-of-the-art methods for simple action recognition.
 
-\begin{table}
+\begin{table}[t]
 \footnotesize
 \centering
 \begin{tabular}{|l|c|}
@@ -130,7 +130,7 @@ dataset at that recall level.
 %that are annotated with the actions.
 
 
-\begin{table}
+\begin{table}[tb]
 \footnotesize
 \centering
 \begin{tabular}{|l|c|c|}
@@ -172,7 +172,7 @@ methodologies that are trained with full spatial supervision.
 %and regions that are involved in each atomic actions.
 
 
-\begin{table}
+\begin{table}[tb]
 \footnotesize
 \centering
 \begin{tabular}{|l|c|}
@@ -227,7 +227,7 @@ in the state-of-the-art.
 %We show in the results the mean accuracy over three splits, provided in the
 %dataset.
 
-\begin{table}
+\begin{table}[tb]
 \footnotesize
 \centering
 \begin{tabular}{|l|c|}
@@ -251,16 +251,17 @@ actions. Table \ref{tab:annotation} summarizes our annotation performance
 results.
 
 
-\begin{table}
+\begin{table}[tbh]
 \footnotesize
 \centering
 \begin{tabular}{|l|c|c|}
 \hline
 \textbf{Testing setup} & \textbf{Precision} & \textbf{Recall}\\
 \hline
-In testing set   & 0.62 & 0.78 \\
-In training set  & 0.67 & 0.85 \\
-In training set, temporal spaning  & 0.86 & 0.90\\ ~~of actions known & &  \\
+Testing set   & 0.62 & 0.78 \\
+\hline
+Training set  & 0.67 & 0.85 \\
+Training set, temporal spaning of actions known & 0.86 & 0.90\\
 \hline
 \end{tabular}
 \caption{Results in Composable Activities dataset, using V latent, showing how the original action annotations are recovered depending on the testing setup. }
@@ -331,6 +332,16 @@ VL-KM-ST   & 91.1\% \\
 \end{table}
 
 \subsection{Qualitative Results}
+
+\begin{figure*}[th]
+\begin{center}
+%\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+\includegraphics[width=0.9\linewidth]{./Fig/poselets.pdf}
+\end{center}
+\caption{TBD}
+\label{fig:poselets}
+\end{figure*}
+
 
 \begin{comment}
 

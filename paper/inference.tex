@@ -3,12 +3,12 @@
 The input to the inference algorithm is a new video sequence with features
 $X$. The task is to infer the best complex action label $\hat y$, and to 
 produce the best labeling of actionlets $\hat V$ and motion poselets $\hat Z$.
-%{\small
+{\small
 \begin{equation}
   \hat y, \hat V, \hat Z = \argmax_{y, V, Z} E(X, Z, V, y)
-\end{equation}
-%}
+\end{equation}}
 We can solve this by exhaustively enumerating all values of complex actions $y$, and solving for $\hat{V}$ and $\hat{Z}$ using:
+{\small
 \begin{equation}
 \begin{split}
  \hat{V}, \hat{Z} | y ~ =~ &   \argmax_{V,Z} ~   \sum_{r=1}^R \sum_{t=1}^T \left( \alpha^r_{y,v_{(t,r)}} 
@@ -18,4 +18,4 @@ We can solve this by exhaustively enumerating all values of complex actions $y$,
 \end{split}
 \label{eq:classify_inference}
 \end{equation}
-%}
+}

@@ -94,7 +94,7 @@ integrated hiearchical model.
 We expresses our hierarchical model using an energy formulation. 
 Specifically, given a video $D$ with $T$ frames, we
 define an energy function for $D$ as:
-
+{\small
 \begin{align}\label{Eq_energy}
 %\begin{split}
 E(D) = & E_{\text{motion poselets}} + E_{\text{motion poselets BoW}} + 
@@ -102,8 +102,7 @@ E_{\text{actionlets BoW}} \nonumber \\
 & + E_{\text{motion poselets transition}} + E_{\text{actionlets 
 transition}}.
 %\end{split}
-\end{align}
-
+\end{align}}
 With respect to the BoW representations and motion poselet classifiers 
 described above, Equation (\ref{Eq_energy}) also 
 consider two additional energy potentials that encode information related to 
@@ -124,7 +123,9 @@ the previous energy potentials are given by:
 \label{eq:motionposelets}E_{\text{motion poselets}}  =  &\sum_{r=1}^R\sum_{t=1}^T  \left[ \sum_{k=1}^K {w^r_k}^\top 
 x_{t,r}\delta_{z_{(t,r)},k} + \theta^r \delta_{z_{(t,r)},K+1}\right] \\
 E_{\text{motion poselets BoW}} & = \sum_{r=1}^R \sum_{a=1}^A {\beta^r_{a}}^\top 
-h^{a}(Z_r,V_r) \\
+h^{a}(Z_r,V_r)
+\end{align}
+\begin{align}
 \label{eq:actionlets_BoW} E_{\text{actionlets BoW}} &=\sum_{r=1}^R {\alpha^r_{y}}^\top h(V_r)  \\
 E_{\text{mot. pos. transition}} & = 
 \sum_{r=1}^R\sum_{k=1}^{K+1}\sum_{k'=1}^{K+1} \eta^r_{k,k'} 
@@ -135,7 +136,6 @@ E_{\text{actionlets transition}} & =\sum_{r=1}^R\sum_{a=1}^A\sum_{a'=1}^A \gamma
 \delta_{v_{(t,r)},a}\delta_{v_{(t+1,r)},a'} 
 \end{align}
 }
-
 In the previous equations, the energy term associated with motion poselets 
 $w^r_k$ refers to a set of $K$ linear pose classifiers, applied to frame 
 descriptors $x_t^r$, according to the label of the latent variable $z_t^r$. 
@@ -195,9 +195,10 @@ To transfer the new labels to the model, we define $u(v)$ as the function that,
 given the actionlet label $v$, returns the corresponding semantic action 
 label $u$. With respect to Equation (\ref{eq:actionlets_BoW}), the energy for 
 the actionlet BoW is replaced by
+{\small
 \begin{equation}
 E_{\text{actionlets BoW}} =  \sum_{r=1}^R\sum_{t=1}^T\sum_{u=1}^U \alpha_{y,u}\delta(u(v_t)=u)
-\end{equation}  
+\end{equation}}
 where we expand histogram $h(V_r)$ to 
 make explicit its dependence to the mapping function $u(v)$. A 
 dictionary of actionlets provide a richer representation for actions, 
