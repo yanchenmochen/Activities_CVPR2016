@@ -192,10 +192,7 @@ In this dataset is clear tee benefits of all the components of the model: as we 
 \hline
 \textbf{Algorithm} & \textbf{Accuracy}\\
 \hline
-Ours, GEO+TRAJ & 70.6\%\\
-Ours, GEO+TRAJ, NI & 72.7\% \\
-Ours, GEO + TRAJ, MUL & 75.3\%\\
-Ours, GEO+TRAJ, NI, VL-KM-ST, MUL &  77.5\% \\
+Our model &  77.5\% \\
 \hline
 Huang et al. \cite{Jhuang2013} & 75.6\% \\
 Ch\'eron et al. \cite{Cheron2015} & 72.5\%\\
@@ -213,6 +210,29 @@ we study the contribution in terms of performance of each component of the
 model.
 We focus our validation on the Composable Activities dataset for the purpose
 of this experiment.
+
+Table \ref{tab:components} summarizes our experimental results with different
+versions of our model.
+
+\begin{table}
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Algorithm} & \textbf{Accuracy}\\
+\hline
+Base Model & 70.6\%\\
+Base Model + GC & 72.7\% \\
+Base Model + Actionlets & 75.3\%\\
+Our Full Model (Actionlets + GC + Latent) &  77.5\% \\
+\hline
+\end{tabular}
+\caption{Analysis of contribution to recognition performance from
+each model component in the sub-JHMDB dataset.}
+\label{tab:components}
+\end{table}
+
+
+
 
 Table \ref{tab:initialization} reports model accuracy under different initialization
 schemes.
