@@ -200,10 +200,32 @@ Cao et al. \cite{cao2015spatio} & 79.0\% \\
 \end{table}
  
 \subsection{Action Recognition in RGB Videos}
+Our experiments so far have evaluated the performance of our model
+in the task of human action recognition in RGBD videos.
+In this experiment, we explore the use of our model in the problem of human
+action recognition in RGB videos. For this purpose, we use the sub-JHMDB
+dataset \cite{Jhuang2013}, which focuses on videos depicting 12 actions and
+where most of the actor body pose is visible in the image frames.
+In our validation, we use the 2D body pose configurations provided by the
+authors and compare performance against previous methods that also use them.
+We summarize the results of this experiment in Table \ref{tab:subjhmdb},
+which shows that our method outperforms alternative action recognition algorithms
+in the state-of-the-art.
 
- \paragraph{sub-JHMDB} In this dataset, we use the annotated joints provided to build our geometric descriptor. Only 15 joints per frame are annotated, and the coordinates of the joins are in 2D image coordinates. We first translate the 15 joints into 20 joints, and also create a \emph{pseudo} 3D data by adding a $z=0$ coordinate to the joints, adding $d$ to the joints of wrists and knees, and subtracting $d$ for elbows, to create a 3D skeleton suitable to our model. AS RGB videos are available, we compute the TRAJ feature as in Composble Acivities Dataset (explain better).
+%\paragraph{sub-JHMDB} In this dataset, we use the annotated joints provided to
+%build our geometric descriptor. Only 15 joints per frame are annotated, and the
+%coordinates of the joins are in 2D image coordinates.
+%We first translate the
+%15 joints into 20 joints, and also create a \emph{pseudo} 3D data by adding a
+%$z=0$ coordinate to the joints, adding $d$ to the joints of wrists and knees,
+%and subtracting $d$ for elbows, to create a 3D skeleton suitable to our model.
+%AS RGB videos are available, we compute the TRAJ feature as in Composble
+%Acivities Dataset (explain better).
 
-In this dataset is clear tee benefits of all the components of the model: as we only have a single action label per video, we use the initialization of videos to get a better representation of the actions in the videos. As this dataset is from videos \emph{on the wild}, the camera view varies from video to video, making this dataset specially suitable to our algorithm of multiple classifiers per semantic action. Finally, the same as the rest of datasets, including the garbage collector math in the model allows to get a more discriminative model as it feeds the pose classifiers only with most informative poses. For a fair comparison, we compare our method with works that used the ground truth joints. We show in the results the mean accuracy over three splits, provided in the dataset.
+%For a fair
+%comparison, we compare our method with works that used the ground truth joints.
+%We show in the results the mean accuracy over three splits, provided in the
+%dataset.
 
 \begin{table}
 \footnotesize
@@ -219,6 +241,7 @@ Ch\'eron et al. \cite{Cheron2015} & 72.5\%\\
 \hline
 \end{tabular}
 \caption{Results in sub-JHMDB dataset. }
+\label{tab:subjhmdb}
 \end{table}
 
 
@@ -255,6 +278,20 @@ of this experiment.
 
 Table \ref{tab:components} summarizes our experimental results with different
 versions of our model.
+
+
+In this dataset is clear tee benefits of all the components of the model: as we
+only have a single action label per video, we use the initialization of videos
+to get a better representation of the actions in the videos.
+As this dataset is
+from videos \emph{on the wild}, the camera view varies from video to video,
+making this dataset specially suitable to our algorithm of multiple classifiers
+per semantic action. Finally, the same as the rest of datasets, including the
+garbage collector math in the model allows to get a more discriminative model
+as it feeds the pose classifiers only with most informative poses.
+
+
+
 
 \begin{table}
 \footnotesize
