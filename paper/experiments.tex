@@ -61,8 +61,9 @@ Vemulapalli \etal \cite{Vemulapalli2014} & 89.5\% \\
 %Lillo et al. \cite{Lillo2014} & 89.5\%\\
 \hline
 \end{tabular}
-\caption{Action classification performances in the MSR-Action3D dataset. }
-\vspace{-2mm}
+\caption{\footnotesize
+Action classification performances in the MSR-Action3D dataset. }
+\vspace{-4mm}
 \label{tab:msr3d}
 \end{table}
 
@@ -144,8 +145,11 @@ Our model &  0.92 & 0.81 \\
 Wei et al. \cite{Wei2013} & 0.85 & 0.81 \\
 \hline
 \end{tabular}
-\caption{Action detection performances in the Concurrent Actions dataset. }
+\caption{
+\footnotesize
+Action detection performances in the Concurrent Actions dataset. }
 \label{tab:concurrent}
+\vspace{-3mm}
 \end{table}
  
 \subsection{Recognition of Composable Activities}
@@ -196,8 +200,11 @@ Cao et al. \cite{cao2015spatio} & 79.0\% \\
 %2-lev-HIER & 83.8\%  \\
 \hline
 \end{tabular}
-\caption{Human action classification performances in the Composable Activities
+\caption{
+\footnotesize
+Human action classification performances in the Composable Activities
 dataset.}
+\vspace{-4mm}
 \label{tab:composable}
 \end{table}
  
@@ -242,8 +249,10 @@ Huang et al. \cite{Jhuang2013} & 75.6\% \\
 Ch\'eron et al. \cite{Cheron2015} & 72.5\%\\
 \hline
 \end{tabular}
-\caption{Action classification performances in the sub-JHMDB dataset.}
+\caption{\footnotesize
+Action classification performances in the sub-JHMDB dataset.}
 \label{tab:subjhmdb}
+\vspace{-4mm}
 \end{table}
 
 
@@ -289,10 +298,13 @@ Training set & Spatial only & 0.86 & 0.90\\
 Training set & Spatio-temporal & 0.67 & 0.85 \\
 \hline
 \end{tabular}
-\caption{Atomic action annotation performances in the Composable Activities
+\caption{
+\footnotesize
+Atomic action annotation performances in the Composable Activities
 dataset. The results show that our model is able to recover spatio-temporal
 annotations both at training and testing time.}
 \label{tab:annotation}
+\vspace{-3mm}
 \end{table}
 
 
@@ -322,7 +334,7 @@ to the overall success of the method.
 %as it feeds the pose classifiers only with most informative poses.
 
 
-\begin{table}
+\begin{table}[tb]
 \footnotesize
 \centering
 \begin{tabular}{|l|c|}
@@ -335,9 +347,12 @@ Base Model + Actionlets & 75.3\%\\
 Our full model (Actionlets + GC + $V$ Latent) &  77.5\% \\
 \hline
 \end{tabular}
-\caption{Analysis of contribution to recognition performance from
+\caption{
+\footnotesize
+Analysis of contribution to recognition performance from
 each model component in the sub-JHMDB dataset.}
 \label{tab:components}
+\vspace{-4mm}
 \end{table}
 
 We also analize the contribution of our self-paced learning framework
@@ -353,7 +368,7 @@ performing clustering on region descriptors.
 We note that our initialization method help the model to achieve its best
 performance.
 
-\begin{table}
+\begin{table}[tb]
 \footnotesize
 \centering
 \begin{tabular}{|l|c|}
@@ -365,8 +380,11 @@ Clustering   & 54.8\% \\
 Ours   & 91.1\% \\
 \hline
 \end{tabular}
-\caption{Results in Composable Activities dataset, using V latent, showing different initializations. }
+\caption{
+\footnotesize
+Results in Composable Activities dataset, using V latent, showing different initializations. }
 \label{tab:initialization}
+\vspace{-3mm}
 \end{table}
 
 \subsection{Qualitative Results}

@@ -2,8 +2,10 @@
 \begin{center}
 %\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
 \includegraphics[width=0.99\linewidth]{./Fig/modelo.pdf}
+\vspace{-2mm}
 \end{center}
-\caption{Graphical representation of our discriminative hierarchical model for 
+\caption{\footnotesize
+Graphical representation of our discriminative hierarchical model for 
 recognition of composable human activities.
 At the top level, activities are represented as compositions of atomic actions that are inferred at
 the intermediate level. These actions are in turn compositions of poses at the
@@ -11,6 +13,7 @@ lower level, where pose dictionaries are learned from data. Our model also learn
 temporal transitions between consecutive poses and actions. Best viewed in
 color.}
 \label{fig:overview}
+\vspace{-4mm}
 \end{figure}
 
 
@@ -37,11 +40,15 @@ process that achieves this goal.
 
 \begin{figure}[tb]
 \begin{center}
-\includegraphics[width=0.95\linewidth]{./Fig/fig_joints_limbs_region.pdf}
+\includegraphics[width=0.8\linewidth]{./Fig/fig_joints_limbs_region.pdf}
+\vspace{-2mm}
 \end{center}
-   \caption{Skeleton representation used for splitting the human body into a set of 
+\caption{
+\footnotesize
+Skeleton representation used for splitting the human body into a set of 
 spatial regions.}
 \label{fig:skeleton_limbs_regions}
+\vspace{-4mm}
 \end{figure}
 
 \subsection{Body regions}
@@ -123,9 +130,7 @@ the previous energy potentials are given by:
 \label{eq:motionposelets}E_{\text{motion poselets}}  =  &\sum_{r=1}^R\sum_{t=1}^T  \left[ \sum_{k=1}^K {w^r_k}^\top 
 x_{t,r}\delta_{z_{(t,r)},k} + \theta^r \delta_{z_{(t,r)},K+1}\right] \\
 E_{\text{motion poselets BoW}} & = \sum_{r=1}^R \sum_{a=1}^A {\beta^r_{a}}^\top 
-h^{a}(Z_r,V_r)
-\end{align}
-\begin{align}
+h^{a}(Z_r,V_r)\\
 \label{eq:actionlets_BoW} E_{\text{actionlets BoW}} &=\sum_{r=1}^R {\alpha^r_{y}}^\top h(V_r)  \\
 E_{\text{mot. pos. transition}} & = 
 \sum_{r=1}^R\sum_{k=1}^{K+1}\sum_{k'=1}^{K+1} \eta^r_{k,k'} 

@@ -26,7 +26,8 @@ spatial spans of its main atomic actions.
 %(a) Spatial & (b) Temporal composition
 \vspace{-0.5cm}
 \end{center}
-\caption{Sample frames from a video sequence featuring a complex action. 
+\caption{\footnotesize
+Sample frames from a video sequence featuring a complex action. 
 Our method is able to identify the complex action, as well as, the temporal and 
 spatial span of meaningful atomic actions (actionlets) and local body part 
 configurations (motion poselets).}
@@ -90,35 +91,25 @@ that we are dealing with long videos, where it is possible to find idle spatial
 or temporal parts, we include in our model a mechanism that identifies and 
 discards idle or non-informative body parts, we refer to this mechanism as 
 garbage collector. In summary, this work makes the following main 
-contributions:
-
-\begin{itemize}
-
-\item Motion poselets: at training time our hierarchical model includes a 
+contributions.
+\emph{(1)}Motion poselets: at training time our hierarchical model includes a 
 new semi-supervised mechanism to learn dictionaries of relevant body 
 part configurations or motion poselets. A test time our model is able to 
 automatically infer the presence and temporal spam of each motion poselet.
-
-
-\item Actionlets: our hierarchical model includes a 
+\emph{(2)}Actionlets: our hierarchical model includes a 
 semi-supervised mechanism to infer dictionaries of relevant body 
 part configurations or motion poselets. 
-
-\item Garbage collector: our model includes a mechanism that
+\emph{(3)}Garbage collector: our model includes a mechanism that
 selectively filter-out noisy and irrelevant spatial and temporal areas of the
 input videos.
-
- \item Empirical evidence indicating that the 
+\emph{(4)}Empirical evidence indicating that the 
 combination of the previous
 contributions in a single hierarchical model result in a more informative and 
 accurate solution than previous state-of-the-art approaches.
-
-\end{itemize}
 
 The rest of the paper is organized as follows:
 Section \ref{sec:related_work} reviews related work;
 Section \ref{sec:model} describes the proposed method;
 Section \ref{sec:experiments}  presents qualitative and quantitative experiments
 on standard benchmark datasets;
-and Section \ref{sec:conclusions} presents concluding remarks and future research
-directions.
+and Section \ref{sec:conclusions} presents concludes the paper.
