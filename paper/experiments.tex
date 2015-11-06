@@ -62,6 +62,7 @@ Vemulapalli \etal \cite{Vemulapalli2014} & 89.5\% \\
 \hline
 \end{tabular}
 \caption{Action classification performances in the MSR-Action3D dataset. }
+\vspace{-2mm}
 \label{tab:msr3d}
 \end{table}
 
@@ -195,7 +196,8 @@ Cao et al. \cite{cao2015spatio} & 79.0\% \\
 %2-lev-HIER & 83.8\%  \\
 \hline
 \end{tabular}
-\caption{Results in Composable Activities dataset. }
+\caption{Human action classification performances in the Composable Activities
+dataset.}
 \label{tab:composable}
 \end{table}
  
@@ -240,37 +242,61 @@ Huang et al. \cite{Jhuang2013} & 75.6\% \\
 Ch\'eron et al. \cite{Cheron2015} & 72.5\%\\
 \hline
 \end{tabular}
-\caption{Results in sub-JHMDB dataset. }
+\caption{Action classification performances in the sub-JHMDB dataset.}
 \label{tab:subjhmdb}
 \end{table}
 
 
 \subsection{Spatio-temporal Annotation of Atomic Actions}
 In this experiment, we study the ability of our model to spatially annotate
-actions. Table \ref{tab:annotation} summarizes our annotation performance
+actions.
+Table \ref{tab:annotation} summarizes our annotation performance
 results.
+After training our model, we measure precision-recall for the spatio-temporal
+atomic action annotations predicted by our model in the testing videos
+(first row).
+This is a very challenging task, as
+the testing videos are not provided any labels and the model
+should predict the temporal extent of each action and the regions of the
+body associated with it. We note that our model achieves good performance
+in this annotation task.
+
+Furthermore, we also study the capability of the model in annotating
+the spatial body region during training. In this case, each video is provided
+with the temporal extent of actions and only the spatial anotation needs to
+be inferred (second row).
+Finally, we note that if we run the trained model over the training videos
+without providing any labels (third row), the model is still able to
+spatio-temporally annotate atomic actions with performance similar to the
+one obtained for the testing set.
+%Note that this is due to the fact
+%that we are not directly optimizing for atomic action annotation
+%We also analyze the performance of the model in discovering the true atomic
+%action annotations in the training set.
+%our model.
 
 
-\begin{table}[tbh]
+\begin{table}[tb]
 \footnotesize
 \centering
-\begin{tabular}{|l|c|c|}
+\begin{tabular}{|l|c|c|c|}
 \hline
-\textbf{Testing setup} & \textbf{Precision} & \textbf{Recall}\\
+\textbf{Videos} & \textbf{Annotation} & \textbf{Precision} & \textbf{Recall}\\
 \hline
-Testing set   & 0.62 & 0.78 \\
+Testing set & Spatio-temporal   & 0.62 & 0.78 \\
 \hline
-Training set  & 0.67 & 0.85 \\
-Training set, temporal spaning of actions known & 0.86 & 0.90\\
+Training set & Spatial only & 0.86 & 0.90\\
+Training set & Spatio-temporal & 0.67 & 0.85 \\
 \hline
 \end{tabular}
-\caption{Results in Composable Activities dataset, using V latent, showing how the original action annotations are recovered depending on the testing setup. }
+\caption{Atomic action annotation performances in the Composable Activities
+dataset. The results show that our model is able to recover spatio-temporal
+annotations both at training and testing time.}
 \label{tab:annotation}
 \end{table}
 
 
-
-\subsection{Model Analysis}
+\subsection{Effect of Model Components}
 In this experiment,
 we study the contribution in terms of performance of each component of the
 model.
@@ -278,20 +304,22 @@ We focus our validation on the Composable Activities dataset for the purpose
 of this experiment.
 
 Table \ref{tab:components} summarizes our experimental results with different
-versions of our model.
+versions of our model. We focus on three main components of our model:
+the garbage collector for poses (GC), Actionlets, and no spatial supervision
+on body regions ($V$ Latent).
+Our reported results in Table \ref{tab:components} show that the full version
+of our model achieves the best performance, with each component contributing
+to the overall success of the method.
 
-
-In this dataset is clear tee benefits of all the components of the model: as we
-only have a single action label per video, we use the initialization of videos
-to get a better representation of the actions in the videos.
-As this dataset is
-from videos \emph{on the wild}, the camera view varies from video to video,
-making this dataset specially suitable to our algorithm of multiple classifiers
-per semantic action. Finally, the same as the rest of datasets, including the
-garbage collector math in the model allows to get a more discriminative model
-as it feeds the pose classifiers only with most informative poses.
-
-
+%In this dataset is clear tee benefits of all the components of the model: as we
+%only have a single action label per video, we use the initialization of videos
+%to get a better representation of the actions in the videos.
+%As this dataset is
+%from videos \emph{on the wild}, the camera view varies from video to video,
+%making this dataset specially suitable to our algorithm of multiple classifiers
+%per semantic action. Finally, the same as the rest of datasets, including the
+%garbage collector math in the model allows to get a more discriminative model
+%as it feeds the pose classifiers only with most informative poses.
 
 
 \begin{table}
@@ -312,19 +340,29 @@ each model component in the sub-JHMDB dataset.}
 \label{tab:components}
 \end{table}
 
-Table \ref{tab:initialization} reports model accuracy under different initialization
-schemes.
+We also analize the contribution of our self-paced learning framework
+for intializing and training our model.
+As in any discriminative model with latent variables, initialization
+is important.
+We summarize our results in
+Table \ref{tab:initialization} by reporting action
+recogntion accuracy obtained by the model under different initialization schemes.
+We compare our initialization method to two baselines. First,
+we initialize the latent variables $V$ randomly. Second, we initialize $V$ by
+performing clustering on region descriptors.
+We note that our initialization method help the model to achieve its best
+performance.
 
 \begin{table}
 \footnotesize
 \centering
 \begin{tabular}{|l|c|}
 \hline
-\textbf{Algorithm} & \textbf{Accuracy}\\
+\textbf{Initialization Algorithm} & \textbf{Accuracy}\\
 \hline
-VL-rand   & 46.3\% \\
-VL-KM-M   & 54.8\% \\
-VL-KM-ST   & 91.1\% \\
+Random   & 46.3\% \\
+Clustering   & 54.8\% \\
+Ours   & 91.1\% \\
 \hline
 \end{tabular}
 \caption{Results in Composable Activities dataset, using V latent, showing different initializations. }
