@@ -2,18 +2,18 @@ Human action recognition in video is a key technology for the development of a
 wide variety of applications, such as surveillance, human-computer interaction,
 and video annotation, among others. Consequently, it has received wide attention
 in the computer vision community with a strong focus on recognition of atomic
-actions using short video sequences
+actions in short video sequences
 \cite{Aggarwal2011,vishwakarma2013survey,weinland2011survey}. As the area
-evolves, recently, there has been an increasing interest to develop more
+evolves, there has been an increasing interest to develop more
 flexible models that are able to operate on longer video sequences featuring
 multiple concurrent or sequential actions, which we refer to as
 \textit{complex actions}. Furthermore, in order to facilitate tasks such as
 video tagging or retrieval, it is also highly appealing to provide these models
-with capabilities to identify the spatial and temporal span of each relevant
-action. As an example, Figure \ref{fig:frontfigure} shows a target scenario,
-where an input video, featuring a complex action, has been automatically
+with capabilities to identify the spatial and temporal spans of each relevant
+action. As an example, Figure \ref{fig:frontfigure} shows a potential usage
+scenario, where an input video featuring a complex action has been automatically
 provided with the set of labels, as well as, temporal and
-spatial span, of its main atomic actions.
+spatial spans of its main atomic actions.
 
 \begin{figure}[t]
 \begin{center} \label{fig:frontfigure}
@@ -34,15 +34,21 @@ poselet that provide each detection.}
 \vspace{-0.5cm}
 \end{figure}
 
-The emergence of cost-effective RGB-D cameras has been an important step to 
-fulfill the previous scenario \cite{Shotton:EtAl:11}. These sensors have 
-provided a reliable source to obtain 3D joint positions of the human skeleton. 
-As it has been noticed long ago \cite{Johansson:1973}, this type of data results 
-highly informative to discriminate among human actions. Furthermore, recent 
-studies have highlighted the relevance of joints position information to 
-identify body poses \cite{Jhuang:EtAl:2013,Wang:EtAl:2013}. We believe that the 
+A promising direction is that of incorporating human body pose information
+to enable such detailed reasoning about complex actions.
+While generic human body pose estimation from color images remains difficult,
+the emergence of cost-effective RGB-D cameras has enable robust
+algorithms for body pose estimation from depth images
+\cite{Shotton:EtAl:11}, and these sensors are now
+a reliable source to obtain 3D joint positions of the human skeleton. 
+As it has been noticed long ago \cite{Johansson:1973}, the use of human body
+pose cues is highly informative to discriminate among human actions.
+Furthermore, recent action recognition methods have
+showcased the relevance of joint position information to 
+recognize actions\cite{Jhuang:EtAl:2013,Wang:EtAl:2013}. We believe that the 
+inherent
 hierarchical and compositional relations among joint positions, body poses, and 
-actions, help to understand the recent success of models that exploit these 
+actions, is behind the recent success of models that exploit these 
 relations to achieve action recognition.
 
 In this work, we present a new approach to recognize
