@@ -388,8 +388,33 @@ Results in Composable Activities dataset, using V latent, showing different init
 \end{table}
 
 \subsection{Qualitative Results}
+In our final experiment, we visualize some of the internals of the model.
+In Figure \ref{fig:poselets_img} we visualize some of the moving poselets
+that our dataset learns from the Composable Activities dataset.
+Each moving poselet clearly captures a salient body configuration that
+carries discriminative power for action labeling and activity recognition.
+Furthermore, each moving poselet can be associated to the most probable
+action it came from, as indicated on top of each poselet in the figure.
+Similarly, Figure \ref{fig:poselets_skel} illustrates some moving poselets
+for the Concurrent Actions dataset.
 
-\begin{figure}[th]
+Finally, we visualize the action annotations produced by our model. In
+Figure \ref{fig:actionlabels} (top), we show the action labels associated
+to each body part in a video from the Composable Activities dataset.
+Figure \ref{fig:actionlabels} (bottom) illustrates per-body part action
+annotations for a video in the Concurrent Actions dataset. These
+examples illustrate the powerful capabilities of our model for correctly
+annotating which body parts are involved in the execution of actions,
+in spite of not having that information at training time.
+
+We refer the reader to our supplementary material for additional technical
+details and example results.
+
+
+
+
+
+\begin{figure}[tb]
 \begin{center}
 %\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
 %\includegraphics[width=0.9\linewidth]{./Fig/poselets.pdf}
@@ -403,7 +428,11 @@ Results in Composable Activities dataset, using V latent, showing different init
  Motion poselet \#19 - most probable action: waving hand\\
  \includegraphics[trim=0 0 0 0.35cm, clip, width=0.49\textwidth]{Fig/poselets3}
 \end{center}
-\caption{TBD}
+\vspace{-4mm}
+\caption{
+\footnotesize
+Moving poselets automatically learned from the Composable Activities
+dataset.}
 \label{fig:poselets_img}
 \end{figure}
 
@@ -421,7 +450,11 @@ Results in Composable Activities dataset, using V latent, showing different init
  \includegraphics[trim=0 0 0cm 0cm, clip, width=0.49\textwidth]{Fig/poselets6}
 
 \end{center}
-\caption{TBD}
+\vspace{-4mm}
+\caption{
+\footnotesize
+Moving poselets automatically learned from the Concurrent Actions
+dataset.}
 \label{fig:poselets_skel}
 \end{figure}
 
@@ -432,7 +465,12 @@ Results in Composable Activities dataset, using V latent, showing different init
 \scriptsize
 \includegraphics[]{Fig/labels_acciones}
 \end{center}
-\caption{TBD}
+\vspace{-4mm}
+\caption{
+\footnotesize
+Automatic spatio-temporal annotation of atomic actions. Our method
+detects the temporal span and spatial body regions that are involved in
+the performance of atomic actions in videos.}
 \label{fig:actionlabels}
 \end{figure}
 
