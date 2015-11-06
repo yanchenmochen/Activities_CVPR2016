@@ -205,6 +205,27 @@ Ch\'eron et al. \cite{Cheron2015} & 72.5\%\\
 
 
 \subsection{Spatio-temporal Annotation of Atomic Actions}
+In this experiment, we study the ability of our model to spatially annotate
+actions. Table \ref{tab:annotation} summarizes our annotation performance
+results.
+
+
+\begin{table}
+\centering
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Testing setup} & \textbf{Precision} & \textbf{Recall}\\
+\hline
+In testing set   & 0.62 & 0.78 \\
+In training set  & 0.67 & 0.85 \\
+In training set, temporal spaning  & 0.86 & 0.90\\ ~~of actions known & &  \\
+\hline
+\end{tabular}
+\caption{Results in Composable Activities dataset, using V latent, showing how the original action annotations are recovered depending on the testing setup. }
+\label{tab:annotation}
+\end{table}
+
+
 
 \subsection{Model Analysis}
 In this experiment,
@@ -251,21 +272,6 @@ VL-KM-ST   & 91.1\% \\
 \hline
 \end{tabular}
 \caption{Results in Composable Activities dataset, using V latent, showing different initializations. }
-\label{tab:initialization}
-\end{table}
-
-\begin{table}
-\centering
-\begin{tabular}{|l|c|c|}
-\hline
-\textbf{Testing setup} & \textbf{Precision} & \textbf{Recall}\\
-\hline
-In testing set   & 0.62 & 0.78 \\
-In training set  & 0.67 & 0.85 \\
-In training set, temporal spaning  & 0.86 & 0.90\\ ~~of actions known & &  \\
-\hline
-\end{tabular}
-\caption{Results in Composable Activities dataset, using V latent, showing how the original action annotations are recovered depending on the testing setup. }
 \label{tab:initialization}
 \end{table}
 
