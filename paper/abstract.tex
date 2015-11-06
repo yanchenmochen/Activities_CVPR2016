@@ -1,19 +1,20 @@
 In this paper, we introduce a new hierarchical model for human action
-recognition that is able to categorize complex actions performed in videos.
-Our model is also able to perform spatio-temporal annotation of the atomic
-actions that compose the overall complex action. That is, for each atomic
+recognition using body joint locations. This model is able to categorize complex actions 
+performed in videos, as well as, to perform spatio-temporal annotations of the atomic
+actions that compose the underlying complex action. That is, for each atomic
 action, the model generates temporal atomic action annotations by
-inferring the starting and ending times of the atomic action, as well
+inferring its starting and ending times, as well as,
 spatial annotations by inferring the human body parts that are involved
 in each atomic action. Our model has three key properties:
 (i) it can be trained with no spatial
-supervision, as it is able to automatically discover the relevant body parts
+supervision, as it is able to automatically discover active body parts
 from temporal action annotations only;
-(ii) its jointly learned poselet and actionlet representation encodes the
-visual variability of actions with good generalization power;
-(iii) its mechanism for handling noisy body pose estimates make it robust to
+(ii) it jointly learns representations for motion poselets and actionlets that encode the
+visual variability of body parts and atomic actions, respectively;
+(iii) it includes a mechanism for handling noisy body pose estimates which increases its 
+robustness to
 common pose estimation errors.
-We experimentally evaluate the performance of our method in multiple
+We experimentally evaluate the performance of our method using multiple
 action recognition benchmarks. Our model consistently outperform baselines
 and state-of-the-art action recognition methods. 
 
