@@ -51,17 +51,18 @@ hierarchical and compositional relations among joint positions, body poses, and
 actions, is behind the recent success of models that exploit these 
 relations to achieve action recognition.
 
-In this work, we present a new approach to recognize
-complex human actions using RGB-D data. As a distinguishing feature,
+In this work, we present a new pose-based approach to recognize
+complex human actions in videos. As a distinguishing feature,
 given a video featuring a complex action, the
 proposed method is able to identify not only the complex action occurring in the
-video, but also the temporal and spatial extend of the corresponding atomic
-actions. In terms of spatial extend, each atomic action is characterized by a 
+video, but also the temporal and spatial extent of the corresponding atomic
+actions. In terms of spatial extent, each atomic action is characterized by a 
 set of characteristic local body configurations that 
+\todo[inline]{Alvaro, parece que quedo una idea incompleta aqui... [JC]}
 
-In particular, we focus on actions that can be characterized by the
-body motions of a single actor, such as running, drinking, or eating. This
-allows us to test our approach using several popular benchmark datasets.
+%In particular, we focus on actions that can be characterized by the
+%body motions of a single actor, such as running, drinking, or eating. This
+%allows us to test our approach using several popular benchmark datasets.
 
 Our model follows previous hierarchical compositional approaches based on Bag
 of Words (BoWs) representations, such as \cite{Wang2013, 
@@ -78,19 +79,20 @@ motion poselets and actionlets, as well as, their spatial and
 temporal relations
 \cite{Lillo2014}.
 
-Our model innovate with respect to previous works by infering not only at test, 
-but also at training time, action labels for each detected motion poselet, as 
+Our model has some key novel properties with respect to previous work.
+Our model infers \emph{both at test and training time},
+action labels for each detected motion poselet, as 
 well as, its temporal and spatial span. To achieve this, we introduce a novel 
 formulation based on a structural latent SVM model \cite{Yu:Joachims:2010} and a 
-initialization method based on self-pace learnining \cite{Kumar:EtAl:2010}. 
-Furthermore, we extend the local dictionary learning process to the level of 
+initialization method based on self-pace learning \cite{Kumar:EtAl:2010}. 
+Furthermore, we extend the pose dictionary learning process to the level of 
 atomic actions by learning for each action a set of classifiers that are able to 
 capture relevant variations in its execution. We refer to the component of these 
 dictioaries of action modes as actionlets \cite{Wang:EtAl:2012}. Finally, given 
 that we are dealing with long videos, where it is possible to find idle spatial 
 or temporal parts, we include in our model a mechanism that identifies and 
-discards idle or non-informative video pars, we refer to this mechanism as 
-garbage collector. Consequently, this work makes the following main 
+discards idle or non-informative body parts, we refer to this mechanism as 
+garbage collector. In summary, this work makes the following main 
 contributions:
 
 \begin{itemize}
