@@ -1,20 +1,20 @@
 There is a large amount of work on human activity recognition in the computer
-vision community \cite{Aggarwal2011,Poppe2010}. 
+vision community
+\cite{Aggarwal2011,Poppe2010,vishwakarma2013survey,weinland2011survey}.
 In particular, we focus on the problem of recognizing human actions and
 activities from videos using pose-based representations and review in the
 following some of the most relevant previuos work.
 
 The idea of using human body poses and configurations as an important
-cue for recognizing human actions has been explored recurrently
-\cite{Feng2002, Tao2015}, as poses provide strong cues on the actions
+cue for recognizing human actions has been explored recurrently,
+as poses provide strong cues on the actions
 being performed.
 Initially, most research focused on pose-based action recognition in color
 videos \cite{Feng2002, Thurau2008}.
 But due to development of pose-estimation
 methods on depth images\cite{Shotton:EtAl:11}, there has been a recent interest in
 pose-based action recognition from RGBD videos
-\cite{Escorcia2012, Hu2015, Tao2015, Vemulapalli2014}.
-\todo[inline]{Cite datasets instead here?}
+\cite{Escorcia2012, Hu2015, Vemulapalli2014}.
 Furthermore, some methods have tackled the problem of jointly recognizing
 actions and poses in videos \cite{Nie2015} and in still images \cite{Yao2010},
 with the hope to create positive feeback by solving both tasks simoultaneously.
@@ -65,3 +65,10 @@ Wei \etal \cite{Wei2013}.
 Another recent trend aims at fine-grained detection of actions performed in sequence
 such as those in a cooking scenario \cite{Rohrbach2012, Lan2015}.
 
+We build our model upon several of these ideas in the literature. Our model
+extends the state-of-the-art by introducing a model that can perform
+detailed annotation of videos during testing time, but requires weak
+supervision at training time. While learning can be done with
+reduced lables, the hiearchical structure of poselets and actionlets combined
+with other key mechanisms enable our model to achieve improved
+performance over competing methods in several evaluation benchmarks.
