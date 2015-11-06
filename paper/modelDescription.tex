@@ -1,9 +1,10 @@
 \begin{figure}[tb]
 \begin{center}
-%\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
-\includegraphics[width=0.99\linewidth]{./Fig/modelo.pdf}
+\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
+%\includegraphics[width=0.99\linewidth]{./fig_graphical_hierarchic_model.pdf}
 \end{center}
-   \caption{Graphical representation of our discriminative hierarchical model for recognition of composable human activities.
+\caption{Graphical representation of our discriminative hierarchical model for 
+recognition of composable human activities.
 At the top level, activities are represented as compositions of atomic actions that are inferred at
 the intermediate level. These actions are in turn compositions of poses at the
 lower level, where pose dictionaries are learned from data. Our model also learn
@@ -14,75 +15,211 @@ color.}
 \end{figure}
 
 
-In this section, we introduce our model for pose-based recognition of complex
-human actions. Our goal is to give the model the capability of annotating input
-videos with the actions being performed at test time. In particular, we are
-interested in automatically identifying the parts of the body that are involved
-in each action (spatial localization), as well as the temporal span of each
-action (temporal localization). Since we are interested in complex actions that
-can be concurrent and composable,
-we would also like to encode multiple levels of
-abstraction, so that we can encode poses, actions and their compositions.
-Therefore, we develop a hierarchical compositional framework for modeling and
-recognizing complex human actions.
+In this section, we introduce our model for pose-based recognition of complex 
+human actions. Our goal is to provide the model with the capability of 
+annotating input videos according to the actions being performed. In 
+particular, we are interested in automatically identifying the parts of the body 
+that are involved in each action (spatial localization), as well as the temporal 
+span of each action (temporal localization). Since we are interested in 
+concurrent and composable activities, we would also like to encode multiple 
+levels of abstraction, so that we can encode poses, actions, and their 
+compositions. Therefore, we develop a hierarchical compositional framework for 
+modeling and recognizing complex human actions.
 
-One of the key contributions of our model is its capability of spatially
-localizing the body regions that are involved with the execution of each
-activity, \emph{both at training and testing time}. This is, our training
-process does not require careful spatial annotation and localization of
-actions in the training set. Instead, our model can automatically
-discover these spatial body regions that are relevant to each action
-from temporal annotations of actions alone. In the following, we introduce
-the components of our model and the training process that achieves this goal.
+One of the key contributions of our model is its capability of spatially 
+localizing the body regions that are involved in the execution of each action, 
+\emph{both at training and testing time}. This is, our training process does not 
+require careful spatial annotation and localization of actions in the training 
+set. Instead, it uses temporal annotations of actions so 
+that, at test time, it can discover the spatial and temporal span, as well as, 
+the specific configuration of the main body regions executing each action. In 
+the following, we introduce the components of our model and the training 
+process that achieves this goal.
 
-\subsection{Hierarchical Activity Model for Weakly Supervised Discovery of
-Relevant Moving Poselets}
-TITLE IS A PLACEHOLDER
+\subsection{Body regions}
+We divide the body pose into $R$ fixed spatial regions and independently compute 
+a pose feature vector for each region. Fig. \ref{fig:skeleton_limbs_regions} 
+illustrates the case when $R = 4$ that we use in all our experiments. Our body 
+pose feature vector consists of the concatenation of two descriptors. At frame 
+$t$ and region $r$, a descriptor $x^{g}_{t,r}$ encodes geometric information 
+about the spatial configuration of body joints, and a descriptor $x^{m}_{t,r}$ 
+encodes local motion information around each body joint position. Following 
+\cite{Lillo2014}, our geometric descriptor is based on angles between segments 
+connecting two joints, and angles between these segments and a plane formed by 
+three joints (see \cite{Lillo2014} for details). Following \cite{WangCVPR2011}, 
+our motion descriptor is based on tracking motion trajectories of key points, in 
+our case, joint positions. Specifically, we compute at each joint location a HOF 
+using RGB patches centered at the joint location for a temporal window of 15 
+frames. At each joint location, this produces a 108-dimensional descriptor,  
+that we concatenate across all joints to obtain our motion descriptor. Finally, 
+to reduce dimensionality, we apply PCA to transform the concatenated descriptor 
+into a 20-dimensional vector, keeping the dimensionality of our final descriptor 
+relatively low.
 
-\paragraph{Training}
 
-\paragraph{Inference}
+\subsection{Hierarchical compositional model}
 
-\subsection{Capturing large action variabilities with a Mixture of Action
-Classifiers}
-TITLE IS A PLACEHOLDER
+We propose a compositional hierarchical model that spans three semantic levels. 
+At the top level, our model assumes that each complex action is composed of a 
+temporal and spatial arrangement of a known set of $A$ atomic actions, where 
+each input video has a single complex action label. Similarly, at the 
+intermediate level, our model assumes that each atomic action is composed of a 
+temporal and spatial arrangement of $K$ body poses, where $K$ is a parameter of 
+our model. Finally, at the bottom level, our model identifies local body poses 
+using a bank of linear classifiers that are applied to the incoming frame 
+descriptors. 
 
-Multiple action classifiers
+Similarly to previous works \cite{Lillo2014, Taralova:EtAl:2014}, we build 
+each layer of our hierarchical model on top of BoWs 
+representations. To this end, at the bottom level of our hierarchy, and for 
+each body region, we learn a dictionary of body part configurations that we 
+refer to as motion poselets. Similarly, at the mid-level of our hierarchy, and 
+for each atomic action, we learn a dictionary of representative action 
+configurations that we refer to as actionlets. At each of these levels, 
+spatio-temporal activations of the corresponding dictionary words are then used 
+to obtain the histograms of the BoWs representations. Next two sections provide 
+details behind the process to represent and learn the dictionaries of motion 
+poselets and actionlets. Here we provide further details of the 
+integrated hiearchical model.
 
-\subsection{Robustness to irrelevant, non-discrimiantive, or noisy poses}
-TITLE IS A PLACEHOLDER
+We expresses the resulting hierarchical model using an energy formulation. 
+Specifically, given a video $D$ with $T$ frames, we
+define an energy function for $D$ as:
 
-Garbage collector.
+\begin{align}\label{Eq_energy}
+%\begin{split}
+E(D) = & E_{\text{motion poselets}} + E_{\text{motion poselets BoW}} + 
+E_{\text{actionlets BoW}} \nonumber \\ 
+& + E_{\text{motion poselets transition}} + E_{\text{actionlets 
+transition}}.
+%\end{split}
+\end{align}
+
+In Equation (\ref{Eq_energy}), We 
+also 
+consider two additional energy potentials that encode information related to 
+temporal 
+transitions between pairs of motion poselets ($E_{\text{motion poselets 
+transition}}$) and 
+actionlets ($E_{\text{actionlets transition}}$). Our goal is to find the 
+spatial and temporal arrangement 
+of motion poselets and actionlets, as well as, the underlying 
+complex action, that maximize $E(D)$. 
+
+Using BoW representations and linear classifiers to identify motion poselets, 
+the previous energy function is given by:
+
+\small{
+\begin{align}
+E_{\text{motion poselets}}  =  \sum_{r,t} & \left[ \sum_{k=1}^K {w^r_k}^\top 
+x_{t,r}\delta(z_{t,r} = k) + 
+\theta^r \delta(z_{t,r}=K+1)\right] \\
+E_{\text{motion poselets BoW}} & = \sum_{r=1}^R \sum_{a=1}^A {\beta^r_{a}}^\top 
+h^{a}(Z_r,V_r) \\
+E_{\text{actionlets BoW}} &=\sum_{r=1}^R {\alpha^r_{y}}^\top h(V_r) \\
+E_{\text{motion poselets transition}} & = \sum_{r,k,k'} \eta^r_{k,k'} 
+\sum_{t=1}^{T-1} 
+\delta(z_{t-1,r}=k)\delta(z_{t,r}=k')\\
+E_{\text{actionlets transition}} & =\sum_{r, a,a'} \gamma^r_{a,a'} 
+\sum_{t=1}^{T-1} 
+\delta(v_{t,r}=a)\delta(v_{t+1,r}=a') 
+\end{align}
+}
 
 
-\todo[inline]{El texto que sigue es el original de ivan.}
+\todo[inline]{IVAN ACA HAY QUE EXPLICAR LA NOTACION DE LAS ECUACIONES 
+ANTERIORES}
 
-Our model for complex action recognition follows a hierarchical compositional
-approach based on pose and mid-level representations, such as \cite{Lillo2014}
-or \cite{Tao2015} .  As a distinguishing idea from previous works, we include a
-mechanism to infer not only the global activity label of the videos, but also
-recover quality temporal and spatial annotations of actions and poses. To this
-end, we explore three main ideas: first, we create method to automatically
-infer mid-level annotations for localize actions spatially. Then, going towards
-general action recognition, we describe a method to handle multiple classifiers
-for the same action, fostering to create action models with better
-representation power in hierarchical setups, where usually low and mid-level
-components are shared throughout high level activities. Finally, to complement
-the generalization of the model we aim to build discriminative low level
-classifiers. When using pose dictionaries, there is a high chance that noisy
-and non-informative poses are present when training low-level (pose)
-classifiers. In models like  \cite{Tao2015}, where  video descriptors use
-aggregated data of the complete video, the effect of non-informative poses is
-mitigated compared to a frame-based model, even when the latter provide richer
-interpretations. We build our model in a general hierarchical activity model
-based on BoW representations, although the approach can be extended to
-hierarchical models in general.
 
-\input{hierarchicalModel}
+\subsection{Learning motion poselets}
+\todo[inline]{IVAN ACA HAY QUE EXPLICAR QUE LA ECUACION ANTERIOR A NIVEL DE 
+POSES ES PROVISTA DE VARIABLES LATENTES}
+
+\subsection{Learning actionlets}
+A single linear classifier does not offer enough flexibility to identify 
+actions that feature high variability. Consequently, we augment the previous 
+hierarchical model to include multiple linear classifiers per action. We create 
+two new concepts: \textbf{semantic actions}, that refer to actions \emph{names} 
+that compose an activity; and \textbf{atomic sequences}, that refers to the 
+sequence of poses that conform an action. Several atomic sequences can be 
+associated to a single semantic action, creating disjoint sets of atomic 
+sequences, each set associated to a single semantic action.  The main idea is 
+that the action annotations in the datasets are associated to semantic actions, 
+whereas for each semantic action we learn several atomic sequence classifiers. 
+With this formulation, we can handle the multimodal nature of semantic actions, 
+covering the changes in motion, poses , or even changes in meaning of the action 
+according to the context (e.g. the semantic action ``open'' can be associated to 
+opening a can, opening a door, etc.). 
+
+Inspired by \cite{Raptis2012}, we first use the \emph{Cattell's Scree test} for 
+finding a suitable number of atomic sequence for every semantic action. Using 
+the semantic action labels, we compute a descriptor for every interval using 
+normalized histograms of pose labels. Then, for a particular semantic action 
+$u$, we compute the the eigenvalues $\lambda_u$ of the affinity matrix of the 
+semantic action descriptors, using $\chi^2$ distance. For each semantic action 
+$u \in \{1,\dots,U\}$ we find the number of atomic sequences $G_u$ as $G_u = 
+\argmin_i \lambda_{i+1}^2 / (\sum_{j=1}^i \lambda_j) + c\cdot i$, with $c=2\cdot 
+10^{-3}$. Finally, we cluster the descriptors corresponding to each semantic 
+action using k-means, using a different number of clusters for each semantic 
+action $u$ according to $G_u$. This approach generates non-overlapping atomic 
+sequences, each associated to a single semantic action.
+
+To transfer the new labels to the model, we define $u(v)$ as the function that 
+given the atomic sequence label $v$, returns the corresponding semantic action 
+label $u$. The energy for the activity level is then
+\begin{equation}
+E_{\text{activity}} =  \sum_{u=1}^U\sum_{t=1}^T \alpha_{y,u}\delta(u(v_t)=u)
+\end{equation}  
+
+For the action and pose labels the model remains unchanged. Using the new atomic 
+sequences allows a richer representation for actions, while in he activity 
+level, several atomic sequences will map to a single semantic action. This 
+behavior resembles a max-pooling operation, where we will choose at inference 
+the atomic sequences that best describe the performed actions in the video, 
+keeping the semantics of the original labels. 
+
+\subsection{Garbage collector}
+
+The model in \cite{Lillo2014} uses all poses to feed action classifiers. Out 
+intuition is that only a subset of poses in each video are really discriminative 
+or informative for the actions performed, while there is plenty of poses that 
+corresponds to noisy or non-informative ones. [EXPAND] Our intuition is that 
+low-scored frames in terms of poses (i.e. a low value of $w_{z_t}^\top x_t$ in 
+Eq. (\ref{eq:energy2014})) make the same contribution as high-scored poses in 
+higher levels of the model, while degrading the pose classifiers at the same 
+time since low-scored poses are likely to be related to non-informative frames. 
+We propose to include a new pose, to explicitly handling those low-scored 
+frames, keeping them apart for the pose classifiers $w$, but still adding a 
+fixed score to the energy function to avoid normalization issues and to help in 
+the specialization of pose classifiers. We call this change in the model a 
+\emph{garbage collector} since it handles all low-scores frames and group them 
+having a fixed energy score $\theta$. In practice, we use a special pose entry 
+$K+1$ to identify the non-informative poses. The equation representing the 
+energy for pose level is
+%
+\begin{equation} \label{Eq_poseEnergy}
+E_{\text{poses}}  = \sum_{t=1}^T \left[  {w_{z_t}}^\top x_{t}\delta(z_{t} \le  
+K) + \theta 
+\delta(z_{t}=K+1)\right] 
+\end{equation}
+where $\delta(\ell) = 1$ if $\ell$ is true and $\delta(\ell) = 0$ if
+$\ell$ is false. The action level also change its energy:
+\begin{equation}
+\begin{split}
+ \label{Eq_actionEnergy}
+E_{\text{actions}} =  \sum_{t=1}^T \sum_{a=1}^A \sum_{k=1}^{K+1}  \beta_{a,k} 
+\delta(z_t = k) \delta(v_t = a).
+\end{split}
+\end{equation}
+
+
 
 \input{learning}
 
-\input{inference}
+\input{inference} 
 
-% aybe the video representation must be located in experiments
-%input{videoRepresentation}
+
+
+
+
+

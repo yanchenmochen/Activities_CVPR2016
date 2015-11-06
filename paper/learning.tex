@@ -1,14 +1,76 @@
 \subsection{Learning} \label{subsec:learning}
-
-[IL: These are notes, don't evaluate it yet]
-
-The loss function $\Delta((y_i,V_i),(y,V))$ can no longer depend in the value of $V_i$, since it is now a latent variable. But, as we do know the time span of the actions in all videos, we can compute a list $A_t$ of possible actions for frame $t$, and transform the original loss function into
+A relevant step of our training process is to obtain a suitable inicialization 
+of latent variables. This is challenging task because, at each time 
+interval, each labeled action can be associated with any of the possible 
+subsets of R body regions. Fortunately, the machinery of self-paced 
+learning \cite{} provides us with a suitable solution. Specifically, we 
+formulate the problem of action to region 
+assignment as an optimization problem, constrained using structural 
+information: 
+the actions intervals must not overlap in the same region, and all the action 
+intervals must be present at least in one region. We formulate this labeling 
+problem as a binary Integer Linear Programming (ILP) problem. We define as 
+$v_{r,q}^m=1$ when the action interval $q \in \{1,\dots,Q_m\}$ appears in 
+region 
+$r$ in the video $m$, and $v_{r,q}^m=0$ otherwise. We assume we have pose 
+labels 
+$z_{t,r}$ in each frame, independent for each region, learned via clustering 
+the 
+poses for all frames in all videos. For an action interval $q$, we use as 
+descriptor the histogram of pose labels for each region in the action interval, 
+defined for the video $m$ as $h_{r,q}^m$ . We can solve the problem of finding 
+the correspondence between action intervals and regions in a formulation 
+similar 
+to $k$-means, using the structure of the problem as constraints in the labels, 
+and using $\chi^2$ distance between the action interval descriptors and the 
+cluster centers: 
 \begin{equation}
-\Delta(y_i,(y,V)) = \lambda_y(y_i \ne y) + \lambda_v\frac{1}{T}\sum_{t=1}^T \delta(v_t \notin A_t)
+\begin{split}
+P1) \quad \min_{v,\mu} &\sum_{m=1}^M  \sum_{r=1}^R \sum_{q=1}^{Q_m}  v_{r,q}^m 
+d( h_{r,q}^m - \mu_{a_q}^r) -\frac{1}{\lambda} v_{r,q}^m\\ 
+ \text{s. to} 
+\quad 
+& \sum_{r=1}^R v_{r,q}^m \ge 1\text{, }\forall q\text{, }\forall m \\ 
+%& \sum_{q=1}^{Q_m} v_{r,q}^m \le t_m \\ 
+& v_{r,q_1}^m + v_{r,q_2}^m \le 1 \text{ if } q_1\cap q_2 \neq \emptyset 
+\text{, 
+}\forall r\text{, }\forall m\\  
+& v_{r,q}^m \in \{0,1\}\text{, }\forall q\text{, }\forall{r}\text{, }\forall m
+\end{split}
 \end{equation}
-and use the same group of actions for each frame to impute the labels of actions and poses for each frame during the inference of latent variables
+with
+\begin{equation}
+d( h_{r,q}^m - \mu_{a_q}^r) = \sum_{k=1}^K (h_{r,q}^m[k] - 
+\mu_{a_q}^r[k])^2/(h_{r,q}^m[k] +\mu_{a_q}^r[k]).
+\end{equation}
 
-The model parameters are learned with a Latent Structural SVM formulation, iterating between searching the best assignments of poses $Z$ given the model parameters, and finding the best classifiers given the poses $Z$:
+$\mu_{a_q}^r$ are computed as the mean of the descriptors with the same action 
+label within the same region. We solve $P1$ iteratively as $k$-means,  finding 
+the cluster centers for each region $r$, $\mu_{a}^r$ using the labels 
+$v_{r,q}^m$, and then finding the best labeling given the cluster centers, 
+solving an ILP problem. Note that the first term of the objective function is 
+similar to a $k$-means model, while the second term resembles the objective 
+function of \emph{self-paced} learning as in \cite{Kumar2010}, fostering to 
+balance between assigning a single region to every action, towards assigning 
+all 
+possible regions to the action intervals when possible.  
+
+[IL: INCLUDE  FIGURE TO SHOW P1 GRAPHICALLY]
+The loss function $\Delta((y_i,V_i),(y,V))$ can no longer depend in the value 
+of $V_i$, since it is now a latent variable. But, as we do know the time span 
+of the actions in all videos, we can compute a list $A_t$ of possible actions 
+for frame $t$, and transform the original loss function into
+\begin{equation}
+\Delta(y_i,(y,V)) = \lambda_y(y_i \ne y) + \lambda_v\frac{1}{T}\sum_{t=1}^T 
+\delta(v_t \notin A_t)
+\end{equation}
+and use the same group of actions for each frame to impute the labels of 
+actions 
+and poses for each frame during the inference of latent variables
+
+The model parameters are learned with a Latent Structural SVM formulation, 
+iterating between searching the best assignments of poses $Z$ given the model 
+parameters, and finding the best classifiers given the poses $Z$:
 \begin{equation}
  Z_i^* = \max_{Z_i} E(X_i, Z_i, V_i, y_i)
-\end{equation} 
+\end{equation}
