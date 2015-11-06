@@ -5,21 +5,22 @@ of latent variables. This is challenging task because, at each time
 interval, each labeled action can be associated with any of the possible 
 subsets of R body regions. Fortunately, the machinery of self-paced 
 learning \cite{Kumar:EtAl:2010} provides us with a suitable solution. Specifically, we 
-formulate the problem of action to region 
-assignment as an optimization problem, constrained using structural 
-information: 
-the actions intervals must not overlap in the same region, and all the action 
-intervals must be present at least in one region. We formulate this labeling 
-problem as a binary Integer Linear Programming (ILP) problem. We define as 
+formulate the association problem between actions and body regions as an 
+optimization problem. We constrain this optimization using two structural 
+restrictions: i) actions intervals must not overlap in the same region, and 
+ii) all action 
+intervals must be present at least in one region. We formulate the labeling 
+process as a binary Integer Linear Programming (ILP) problem. We define as 
 $v_{r,q}^m=1$ when the action interval $q \in \{1,\dots,Q_m\}$ appears in 
 region 
-$r$ of video $m$, and $v_{r,q}^m=0$ otherwise. We assume we have initial motion poselet 
+$r$ of video $m$, and $v_{r,q}^m=0$ otherwise. We assume that we have initial 
+motion poselet 
 labels 
 $z_{t,r}$ in each frame, independent for each region. For an action interval $q$ and region $r$, we use as 
 descriptor the histogram $h_{r,q}^m$ of motion poselet labels. We can solve the problem of finding 
-the correspondence between action intervals and regions in a formulation 
-similar 
-to $k$-means using the structure of the problem as constraints in the labels:
+the correspondence between action intervals and regions using a formulation 
+that resembles the operation of the $k$-means algorithm, but using the 
+structure of the problem as constraints in the labels:
 \begin{equation}
 \begin{split}
 P1) \quad \min_{v,\mu} &\sum_{m=1}^M  \sum_{r=1}^R \sum_{q=1}^{Q_m}  v_{r,q}^m 
@@ -41,18 +42,26 @@ d( h_{r,q}^m - \mu_{a_q}^r) = \sum_{k=1}^K (h_{r,q}^m[k] -
 \end{equation}
 
 $\mu_{a_q}^r$ are computed as the mean of the descriptors with the same action 
-label within the same region. We solve $P1$ iteratively in a blosk descending acheme, alternating between solving $v_{r,q}^m$ with $\mu_{a}^r$ fixed, which have a trivial solution, and then fixing $\mu_{a}^r$ to solve $v_{r,q}^m$, relaxing $P1$ to solve a linear program. Note that th second term of the objective function of $P1$ resembles the objective 
-function of \emph{self-paced} learning as in \cite{Kumar:EtAl:2010}, fostering to 
-balance between assigning a single region to every action, towards assigning 
-all 
-possible regions to the action intervals when possible.  
+label within the same region. We solve $P1$ iteratively using a block coordinate 
+descending scheme, alternating between solving $v_{r,q}^m$ with $\mu_{a}^r$ 
+fixed, which has a trivial solution, and then fixing $\mu_{a}^r$ to solve 
+$v_{r,q}^m$, relaxing $P1$ to solve a linear program. Note that the second term 
+of the objective function in $P1$ resembles the objective function of 
+\emph{self-paced} learning \cite{Kumar:EtAl:2010}, managing the balance between 
+assigning a single region to every action or assigning all possible regions to 
+the respective action interval.  
 
-\paragraph{Learning the model parameters}
-To learn the model parameters, we state the problem as an Latent Structural SVM problem \cite{Yu:Joachims:2010}, with two sets of latent variables for motion poses $Z$ and actionlets $V$. The energy funcion act as constraints of the model, to bias the learning of correct labeling of motion poselets and actionlets. 
+\paragraph{Learning model parameters}
+To learn the model parameters, we state the problem as an Latent Structural SVM 
+problem \cite{Yu:Joachims:2010}, with two sets of latent variables for motion 
+poselets $Z$ and actionlets $V$, respectively. The energy funcion constraints 
+the model towards learning correct labels for motion poselets and 
+actionlets. 
 
-We aim to find
-optimal values for the energy parameters, as well as,
-slack variables $\xi_i$ motion poselet labels $Z_i$ and actionlet labels $V_i$, by solving the following learning problem:
+We find values for parameters in equations 
+(\ref{eq:motionposelets}-\ref{eq:actionletstransition}), as well as,
+slack variables $\xi_i$ motion poselet labels $Z_i$, and actionlet labels $V_i$, 
+by solving the following learning problem:
 \begin{equation}
 \label{eq:big_problem}
 \min_{W,\xi_i,~i=\{1,\dots,M\}}    \frac{1}{2}||W||_2^2 + \frac{C}{M} \sum_{i=1}^M\xi_i ,
@@ -69,9 +78,19 @@ and
 \end{split}
 \end{equation}
 In Equation (\ref{eq:slags}), each slack variable
-$\xi_i$ quantifies the error of the inferred labeling for the corresponding video $D_i$. We solve Equation (\ref{eq:big_problem}) iteratively using CCCP algorithm, solving for latent labels $Z_i$ and $V_i$ given model parameters $W$, temporal actionlet annotations and the complex actions of the videos, using dynamic programming (see Section \ref{subsec:inference}), and then solving for $W$ via 1-slack formulation and using Cutting Plane algorithm \cite{Joachims2009}. 
+$\xi_i$ quantifies the error of the inferred labeling for the corresponding 
+video $D_i$. We solve Equation (\ref{eq:big_problem}) iteratively using CCCP 
+algorithm, solving for latent labels $Z_i$ and $V_i$ given model parameters $W$, 
+temporal actionlet annotations, and the complex actions of the videos, using 
+dynamic programming (see Section \ref{subsec:inference}), and then solving for 
+$W$ via 1-slack formulation using Cutting Plane algorithm 
+\cite{Joachims2009}. 
 
-The loss function $\Delta((y_i,V_i),(y,V))$ punishes the inference errors in the training set during training. As the spatial ordering of actionlets is unknown (hence the latent actionlet formulation), but the temporal composition is know, we can compute a list $A_t$ of possible actionlets for frame $t$, and include  that information into the loss function as
+Loss function $\Delta((y_i,V_i),(y,V))$ penalizes inference errors during 
+training. As the spatial ordering of actionlets is unknown (hence the latent 
+actionlet formulation), but the temporal composition is know, we can compute a 
+list $A_t$ of possible actionlets for frame $t$, and include  that information 
+into the loss function as
 \begin{equation}
 \Delta((y_i,V_i),(y,V)) = \lambda_y(y_i \ne y) + \lambda_v\frac{1}{T}\sum_{t=1}^T 
 \delta(v_t \notin A_t)

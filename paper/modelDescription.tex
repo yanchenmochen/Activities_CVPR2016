@@ -78,19 +78,20 @@ using a bank of linear classifiers that are applied to the incoming frame
 descriptors. 
 
 Similarly to previous works \cite{Lillo2014, Taralova:EtAl:2014}, we build 
-each layer of our hierarchical model on top of BoWs 
+each layer of our hierarchical model on top of BoW 
 representations. To this end, at the bottom level of our hierarchy, and for 
 each body region, we learn a dictionary of body part configurations that we 
-refer to as \emph{motion poselets}. Similarly, at the mid-level of our hierarchy, and 
+refer to as motion poselets. Similarly, at the mid-level of our hierarchy, and 
 for each atomic action, we learn a dictionary of representative action 
-configurations that we refer to as \emph{actionlets}. At each of these levels, 
-spatio-temporal activations of the corresponding dictionary words are then used 
-to obtain the histograms of the BoWs representations. Next two sections provide 
+configurations that we refer to as actionlets. At each of these levels, 
+spatio-temporal activations of the respective dictionary words are used 
+to obtain the corresponding histogram encoding the BoW representation. 
+Next two sections provide 
 details behind the process to represent and learn the dictionaries of motion 
 poselets and actionlets. Here we provide further details of the 
 integrated hiearchical model.
 
-We expresses the resulting hierarchical model using an energy formulation. 
+We expresses our hierarchical model using an energy formulation. 
 Specifically, given a video $D$ with $T$ frames, we
 define an energy function for $D$ as:
 
@@ -103,19 +104,21 @@ transition}}.
 %\end{split}
 \end{align}
 
-In Equation (\ref{Eq_energy}), we 
-also 
+With respect to the BoW representations and motion poselet classifiers 
+described above, Equation (\ref{Eq_energy}) also 
 consider two additional energy potentials that encode information related to 
 temporal 
 transitions between pairs of motion poselets ($E_{\text{motion poselets 
 transition}}$) and 
-actionlets ($E_{\text{actionlets transition}}$). Our goal is to find the 
+actionlets ($E_{\text{actionlets transition}}$), respectively. Our goal is to 
+maximize $E(D)$, such that, we obtain the 
 spatial and temporal arrangement 
 of motion poselets and actionlets, as well as, the underlying 
-complex action, that maximize $E(D)$. 
+complex action. 
 
-Using BoW representations and linear classifiers to identify motion poselets, 
-the previous energy function is given by:
+Considering the BoW representations and linear classifiers to identify motion 
+poselets, 
+the previous energy potentials are given by:
 {\small
 \begin{align}
 \label{eq:motionposelets}E_{\text{motion poselets}}  =  &\sum_{r=1}^R\sum_{t=1}^T  \left[ \sum_{k=1}^K {w^r_k}^\top 
@@ -123,69 +126,100 @@ x_{t,r}\delta_{z_{(t,r)},k} + \theta^r \delta_{z_{(t,r)},K+1}\right] \\
 E_{\text{motion poselets BoW}} & = \sum_{r=1}^R \sum_{a=1}^A {\beta^r_{a}}^\top 
 h^{a}(Z_r,V_r) \\
 \label{eq:actionlets_BoW} E_{\text{actionlets BoW}} &=\sum_{r=1}^R {\alpha^r_{y}}^\top h(V_r)  \\
-E_{\text{mot pos transition}} & = \sum_{r=1}^R\sum_{k=1}^{K+1}\sum_{k'=1}^{K+1} \eta^r_{k,k'} 
-\sum_{t=1}^{T-1} \delta_{z_{(t-1,r)},k}\delta_{z_{(t,r)},k'}\\
+E_{\text{mot. pos. transition}} & = 
+\sum_{r=1}^R\sum_{k=1}^{K+1}\sum_{k'=1}^{K+1} \eta^r_{k,k'} 
+\sum_{t=1}^{T-1} \delta_{z_{(t-1,r)},k}\delta_{z_{(t,r)},k'}\\ 
+\label{eq:actionletstransition}
 E_{\text{actionlets transition}} & =\sum_{r=1}^R\sum_{a=1}^A\sum_{a'=1}^A \gamma^r_{a,a'} 
 \sum_{t=1}^{T-1} 
 \delta_{v_{(t,r)},a}\delta_{v_{(t+1,r)},a'} 
 \end{align}
 }
 
-\todo[inline]{Revisar texto de referencia a ecuaciones}
-
-In the previous equations, In the energy of motion poselets $w^r_k$ refers to a set of $K$ linear pose classifiers, applied to frame descriptors $x_t^r$ according to the label of the latent variable $z_t^r$. Note that there is a special label $K+1$; this will be clear in section \ref{subsec:garbage_collector}. $\delta_{i,j}$ represents the Kronecker delta function. In the energy function of the BoW of motion poselets, $\beta_a^r$ denotes a set of $A$ mid-level classifiers, whose inputs are histograms $h^a(Z_r,V_r)$ of motion poselet labels at those frame annotated as actionlet $a$. In the higher level, $\alpha^r_{y}$ is a linear classifier  associated to complex action $y$, whose input is the histogram of actionlet labels $h(V_r)$. Note that all classifiers and labels are referred to a single region $r$; we add the contributions of all regions to compute the global energy of the video. The transition terms acts as linear classifiers over histograms of motion poselet temporal transitions and actionlet temporal transitions, encoding all the possible transition of labels. 
+In the previous equations, the energy term associated with motion poselets 
+$w^r_k$ refers to a set of $K$ linear pose classifiers, applied to frame 
+descriptors $x_t^r$, according to the label of the latent variable $z_t^r$. 
+Note that there is a special label $K+1$; the role of this label will be 
+explained in Section \ref{subsec:garbage_collector}. $\delta_{i,j}$ represents 
+the Kronecker delta function. In terms of the energy potential associated to 
+the BoW representation for motion poselets, $\beta_a^r$ denotes a set of $A$ 
+mid-level classifiers, whose inputs are histograms $h^a(Z_r,V_r)$ of motion 
+poselet labels at those frame annotated as actionlet $a$. At the highest level, 
+$\alpha^r_{y}$ is a linear classifier  associated to complex action $y$, whose 
+input is the histogram of actionlet labels $h(V_r)$. Note that all classifiers 
+and labels are referred to a single region $r$; we add the contributions of all 
+regions to compute the global energy of the video. The transition terms acts as 
+linear classifiers over histograms of temporal transitions of motion poselet 
+and temporal transitions of actionlet, respectively.
 
 \subsection{Learning motion poselets}
-\todo[inline]{Revisar texto}
-In our model, motion poselets are learned treating them as latent variables during training. Before training, we fix the number of motion poselets in the parameter $K$. In every region $r$ we learn an independent set of pose classifiers $\{w^r_k\}_{k=1}^K$, initializing the motion poselet labels using $k$-means algorithm. Then, we learn pose classifiers jointly with actionlets and complex actions classifiers, allowing the model to discover discriminative motion poselets useful to detect and recognize complex actions. As shown in \cite{Lillo2014}, learning the pose classifiers jointly improves the recognition rates at testing time, compared to using the set of initial labels throughout the learning stage, so we follow the same procedure.   
+In our model, motion poselets are learned treating them as latent variables  
+during training. Before training, we fix the number of motion poselets 
+according to parameter $K$. In every region $r$ we learn an independent 
+set of pose classifiers $\{w^r_k\}_{k=1}^K$, initializing the motion poselet 
+labels using $k$-means algorithm. Then, we learn pose classifiers jointly with 
+actionlets and complex actions classifiers, allowing the model to discover 
+discriminative motion poselets useful to detect and recognize complex actions. 
+As shown in \cite{Lillo2014} and \cite{Tao2015}, jointly learning linear 
+classifiers to identify body parts and atomic actions improves recognition 
+rates, so here we follow a similar hierarchical approach, an integrate learning 
+of motion poselets with learning of actionlets.     
 
 \subsection{Learning actionlets}
-A single linear classifier does not offer enough flexibility to identify 
-actions that feature high variability. Consequently, we augment the previous 
+A single linear classifier does not offer enough flexibility to identify actions 
+that feature high variability. Consequently, we augment the previous 
 hierarchical model to include multiple linear classifiers per action. We create 
 two new concepts: \textbf{semantic actions}, that refer to actions \emph{names} 
-that compose an activity; and \textbf{actionlets}, that refers to the 
-sequence of poses that build an action. Several actionlets can be 
-associated to a single semantic action, creating disjoint sets of actionlets, each set associated to a single semantic action.  The main idea is 
-that the action annotations in the datasets are associated to semantic actions, 
-whereas for each semantic action we learn several actionlet classifiers. 
-With this formulation, we can handle the multimodal nature of semantic actions, 
-covering the changes in motion, poses , or even changes in meaning of the action 
-according to the context (e.g. the semantic action ``open'' can be associated to 
-opening a can, opening a door, etc.). 
+that compose an activity; and \textbf{actionlets}, that refers to the sequence 
+of motion poselets that build an action. The main idea is that action 
+annotations in the dataset are associated to semantic actions, whereas for each 
+semantic action we learn several actionlet classifiers. This formulation allows 
+us to handle the multimodal nature of semantic actions, covering changes in 
+motion, pose, or even changes in meaning of the action according to context 
+(e.g. the semantic action ``open'' can be associated to opening a can, opening a 
+door, etc.). 
 
 Inspired by \cite{Raptis2012}, we first use the \emph{Cattell's Scree test} for 
 finding a suitable number of actionlets for every semantic action in an unsupervised fashion. Using 
 the semantic action labels, we compute a descriptor for every interval using 
 normalized histograms of pose labels. Then, for a particular semantic action 
-$u$, we compute the the eigenvalues $\lambda_u$ of the affinity matrix of the 
+$u$, we compute the eigenvalues $\lambda_u$ of the affinity matrix of the 
 semantic action descriptors, using $\chi^2$ distance. For each semantic action 
-$u \in \{1,\dots,U\}$ we find the number of actionlets $G_u$ as $G_u = 
+$u \in \{1,\dots,U\}$, we find the number of actionlets $G_u$ as $G_u = 
 \argmin_i \lambda_{i+1}^2 / (\sum_{j=1}^i \lambda_j) + c\cdot i$, with $c=2\cdot 
 10^{-3}$. Finally, we cluster the descriptors corresponding to each semantic 
 action using k-means, using a different number of clusters for each semantic 
 action $u$ according to $G_u$. This approach generates non-overlapping actionlets, each associated to a single semantic action.
 
-To transfer the new labels to the model, we define $u(v)$ as the function that 
+To transfer the new labels to the model, we define $u(v)$ as the function that, 
 given the actionlet label $v$, returns the corresponding semantic action 
-label $u$. The energy for the actionlet BoW level is then changed to
+label $u$. With respect to Equation (\ref{eq:actionlets_BoW}), the energy for 
+the actionlet BoW is replaced by
 \begin{equation}
 E_{\text{actionlets BoW}} =  \sum_{r=1}^R\sum_{t=1}^T\sum_{u=1}^U \alpha_{y,u}\delta(u(v_t)=u)
 \end{equation}  
-where we expanded the histogram $h(V_r)$ of Equation (\ref{eq:actionlets_BoW}) to make explicit the dependence to the mapping function $u(v)$.
-For the lower levels the model remains unchanged. Using the new actionlets allows a richer representation for actions, while in the activity 
-level, several actionlets will map to a single semantic action. This 
-behavior resembles a max-pooling operation, where we will choose at inference 
-the actionlets that best describe the performed actions in the video, 
-keeping the semantics of the original labels. 
+where we expand histogram $h(V_r)$ to 
+make explicit its dependence to the mapping function $u(v)$. A 
+dictionary of actionlets provide a richer representation for actions, 
+where several actionlets will map to a single semantic action. This 
+behavior resembles a max-pooling operation, where at inference time we will 
+choose the set of actionlets that best describe the performed actions in the 
+video, keeping the semantics of the original labels. 
 
 \subsection{Motion poselets garbage collector}
 \label{subsec:garbage_collector}
 The model in \cite{Lillo2014} uses all poses to feed action classifiers. Our 
 intuition is that only a subset of poses in each video are really discriminative 
-or informative for the actions performed. Low-scored motion poselets could  degrade the pose classifiers during training, decreasing their performance. 
+or informative for the actions being performed. Low-scored motion poselets 
+could  degrade the pose classifiers during training, decreasing their 
+performance. 
 We include a mechanism to handle those low-scored 
-frames, creating more discriminative motion poselet classifiers $w$. We call this contribution as \emph{motion poselets garbage collector}, since it handles all low-scores motion poselets and group them, yielding more discriminative motion poselets. We use a special pose entry $K+1$ to identify the non-informative poses, which in practice are associated to a score lower than $\theta_r$, as shown in Equation (\ref{eq:motionposelets}).
+frames leading to more discriminative motion poselet classifiers. 
+We call this contribution as \emph{motion poselets garbage collector}, since it 
+handles all low-scores motion poselets and group them. We use a special pose 
+entry $K+1$ to identify the non-informative poses, which in practice are 
+associated to a score lower than $\theta_r$, as shown in Equation 
+(\ref{eq:motionposelets}).
 
 
 
