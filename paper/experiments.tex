@@ -97,6 +97,14 @@ is declared as a true positive if its temporal overlap with the ground
 truth action interval is larger than 60\% of ther union, or if
 the detected interval is completely covered by the ground truth annotation.
 
+Our model is tailored at recognizing complex actions that are composed
+of atomic components. However, in this scenario, only atomic actions are
+provided and no compositions are explicitly defined. We therefore apply
+a simple preprocessing step: we cluster training videos into groups
+by comparing the occurrance of atomic actions within each video.
+The resulting groupings are used as complex actions labels in the training
+videos of this dataset.
+
 Note that at inference time, our model outputs a single labeling per video,
 which corresponds to the action labeling that maximizes the energy of our
 model. Since there are no thresholds to adjust, our model produces a single
@@ -111,19 +119,11 @@ dataset at that recall level.
 %provided in the dataset.
 %We select randomly 50\% of videos for training and the
 %rest for testing.
-\todo[inline]{Ivan: no entiendo bien que es lo que pasa en los siguientes
-dos parrafos... [JC]}
-To apply our model we first cluster the data using the action
-labels for each video, using binary vectors where 1 indicate the action is
-present in the video, and 0 that the action is not present. We apply
-hierarchical clustering using euclidean distance, and find that using 7
-clusters is a good fit. These clusters represents activities, and we first find
-a good initialization for action labeling in four regions.
 
-We want to show using this dataset that the latent formulation achieve good
-recognition performance with respect to the model that uses this dataset. We
-can show also new annotations in this dataset, corresponding to the regions
-that are annotated with the actions.
+%We want to show using this dataset that the latent formulation achieve good
+%recognition performance with respect to the model that uses this dataset. We
+%can show also new annotations in this dataset, corresponding to the regions
+%that are annotated with the actions.
 
 
 \begin{table}
