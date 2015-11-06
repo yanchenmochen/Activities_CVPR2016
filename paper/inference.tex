@@ -1,28 +1,19 @@
 \subsection{Inference}
+\label{subsec:inference}
 The input to the inference algorithm is a new video sequence with features
-$X$. The task is to infer the best activity label $\hat y$ and the best
-atomic action labels $\hat V$. Additionally, we also need to estimate latent variables $Z$.
+$X$. The task is to infer the best complex action label $\hat y$, and produce the best labeling of actionlets $\hat V$ and motion poselets $\hat Z$.
 %{\small
 \begin{equation}
   \hat y, \hat V, \hat Z = \argmax_{y, V, Z} E(X, Z, V, y)
 \end{equation}
 %}
-We can solve this by the same equations for solving the most violated constraint during learning, setting %as in Equation (\ref{dp_recursion}), using 
-$\lambda_i =0$, $i = \{1,2\}$, by exhaustively enumerating all values of activities $y$, and solving for atomic actions assignments $\hat{V}$ and pose assignments $\hat{Z}$ using:
-%the following at each step:
-%%{\small
-%\begin{equation}
-% \hat V, \hat Z | y= \argmax_{V,Z} E(X, Z, V, y)
-%\end{equation}
-%%}
-%Therefore, for each possible activity class $y$, we must find $\hat V$ and
-%$\hat Z$ using:
-%{\small
+We can solve this by exhaustively enumerating all values of complex actions $y$, and solving for $\hat{V}$ and $\hat{Z}$ using:
 \begin{equation}
 \begin{split}
- \hat{V}, \hat{Z} | y ~ =~ &   \argmax_{V,Z} ~   \sum_{t=1}^T \left( \alpha_{y,v_{t}} 
-                  + \beta_{v_{t},z_{t}} + {w_{z_{t}}}^\top x_{t} \delta(z_t \le K)  \right. \\ 
-				& \quad\quad \left. \vphantom{{w_{z_{t}}}^\top x_{t}} + \theta \delta(z_t = K+1) + \gamma_{v_{{t-1}},v_t} + \eta_{z_{{t-1}},z_t}  \right). \\
+ \hat{V}, \hat{Z} | y ~ =~ &   \argmax_{V,Z} ~   \sum_{r=1}^R \sum_{t=1}^T \left( \alpha^r_{y,v_{(t,r)}} 
+                  + \beta^r_{v_{(t,r)},z_{(t,r)}}\right. \\
+				&\quad\quad \left.+ {w^r_{z_{(t,r)}}}^\top x_{t,r} \delta(z_{(t,r)} \le K)  + \theta \delta_{z_{(t,r)}}^{K+1} \right. \\ 
+				& \quad\quad \left.+ \gamma_{v_{({t-1},r)},v_{(t,r)}} + \eta_{z_{({t-1},r)},z_{(t,r)}}  \vphantom{{w^r_{z_{(t,r)}}}^\top x_{t,r}} \right). \\
 \end{split}
 \label{eq:classify_inference}
 \end{equation}
