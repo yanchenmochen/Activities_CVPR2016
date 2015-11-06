@@ -1,29 +1,46 @@
-This section described the experimental results in heterogeneous datasets. We first describes each dataset to specify the experimental setup, whith a brief explanation of why we choose each dataset to evaluate our model. Later, we focus in the strenght of our model, in producing rich annotations in addition to the semantic global labels. 
+In this section, we present experimental results to study the performance
+of our model in the task of complex action recognition. Our experimental
+validation focuses on measuring two aspects of our model.
+First, we measure the action classification accuracy on
+several complex action recognition benchmarks.
+Second, we validate the accuracy of the spatio-temporal atomic action
+annotation of human body regions that are involved in performing the complex
+action.
 
-\subsection{Datasets}
-We evaluate our method using four datasets: MSR-Action3D \cite{WanLi2010}, Concurrect Actions dataset \cite{Wei2013}, Composable Activities Dataset \cite{Lillo2014}, and sub-JHMDB \cite{Jhuang2013}.
+%This section described the experimental results in heterogeneous datasets. We
+%first describes each dataset to specify the experimental setup, whith a brief
+%explanation of why we choose each dataset to evaluate our model. Later, we
+%focus in the strenght of our model, in producing rich annotations in addition
+%to the semantic global labels. 
 
-\paragraph{MSR-Action3D} A very popular skeleton + Depth single action dataset. We use the common setup of using skeleton data from subjects 1,3,5,7,9 for training, and using the rest for testing, using all 20 action categories. We use 557 videos from the dataset as proposed by \cite{Wang2012}. We use this dataset to show how our model performs in a standard database of single actions.
+%\subsection{Experimental Setup}
+\paragraph{Datasets:}
+We evaluate our method on four action recognition benchmarks:
+the MSR-Action3D dataset \cite{WanLi2010},
+Concurrent Actions dataset \cite{Wei2013},
+Composable Activities Dataset \cite{Lillo2014}, and sub-JHMDB
+\cite{Jhuang2013}.
 
-\paragraph{}
 
-[GENERAL IDEA]
+\subsection{Recognition of Simple and Isolated Actions}
 
-What we want to show:
-\begin{itemize}
-\item Show tables of results that can be useful to compare the model.
-\item Show how the model is useful for videos of simple and composed actions, since now the level of annotations is similar.
-\item Show how the inference produces annotated data (poses, actions, etc). In particular, show in Composable Activities and Concurrent actions how the action compositions are handled by the model without post-processing.
-\item Show results in sub-JHMDB,showing how the model detects the action in the videos and also which part of the body performs the action (search for well-behaved videos). It could be interesting to show the annotated data over real RGB videos. 
-\item Show examples of poses (like poselets) and sequences of 3 or 5 poses for actions (Actionlets?)
-\end{itemize}
+As a first experiment,
+we evaluate the performance of our model on the task of simple and
+isolated action recognition in the  MSR-Action3D dataset \cite{WanLi2010}.
+Note that although our model is tailored at recognition of complex human
+actions, this experiment verifies the performance of our model in the
+simpler scenario of atomic action classification.
 
-\subsection{Raw results}
-\label{subsec:exp_setup}
+The MSR-Action3D dataset provides depth videos and estimated body poses
+for isolated actors in pre-trimmed videos performing actions from 20
+categories. We use 557 videos in the dataset in a similar setup to
+\cite{Wang2012}, where videos from subjects 1, 3, 5, 7, 9 are used for
+training and the rest for testing.
 
-\paragraph{MSR-Action3D} Setup: subjects 1,3,5,7,9 for training, rest for testing, using all 20 action categories. This dataset is more as a proof of concept, that our model achieves near state-of-the-art accuracy in a standard dataset. In fact, omitting Tao el at. ICCV 2015 paper, we would achieve the best accuracy. BUT, they do not provide the rich annotations for testing data as our model. Also, we use the same initialization method to automatically annotate the actions in the dataset: the initialization method is integrated with the model and is independent of the dataset.
-
-\paragraph{Concurrent Action dataset} This dataset has 61 videos of variable time, some of them are very long comoared to other action datasets. The videos has a variable number of actions. The skeleton data and action annotations are provided in the dataset. We select randomly 50\% of videos for training and the rest for testing. To apply our model we first cluster the data using the action labels for each video, using binary vectors where 1 indicate the action is present in the video, and 0 that the action is not present. We apply hierarchical clustering using euclidean distance, and find that using 7 clusters is a good fit. These clusters represents activities, and we first find a good initialization for action labeling in four regions. For testing, we only use the action labeling, using the same evaluation setup as in \cite{Wei2013}: a detected action interval is taken as correct if the overlapping length of the detected interval and the ground truth interval is larger 60\% than their union length or the detected interval is totally covered by the ground truth interval. The training/testing split is 50/50, chosen randomly, the same as in \cite{Wei2013}.
+We measure action classification accuracy and report the results obtained
+by our model and other competing methods in Table \ref{tab:msr3d}.
+We note that our model achieves comparable performance with respect
+to the state-of-the-art methods for simple action recognition.
 
 \begin{table}
 \centering
@@ -31,19 +48,96 @@ What we want to show:
 \hline
 \textbf{Algorithm} & \textbf{Accuracy}\\
 \hline
-Ours, GEO+VEL, NI &  93.0\% \\
-Ours, GEO+VEL  & 91.2\% \\
+Our model &  93.0\% \\
+%Ours, GEO+VEL, NI &  93.0\% \\
+%Ours, GEO+VEL  & 91.2\% \\
 \hline
-%J. Luo et al. \cite{luo2013group} & \textbf{96.7\%} \\
-%Y. Zhu et al. \cite{zhu2013fusing} & 94.3\% \\
-L.Tao et al. \cite{Tao2015} & 93.6\% \\
-C. Wang et al.\cite{Wang2013} &    90.2\% \\
-Vemulapalli et al. \cite{vemulapalli2014human} & 89.5\% \\
-Lillo et al. \cite{Lillo2014} & 89.5\%\\
+L. Tao \etal \cite{Tao2015} & 93.6\% \\
+C. Wang \etal \cite{Wang2013} &    90.2\% \\
+Vemulapalli \etal \cite{vemulapalli2014human} & 89.5\% \\
+%Lillo et al. \cite{Lillo2014} & 89.5\%\\
 \hline
 \end{tabular}
-\caption{Results in MSR-Action3D dataset. }
+\caption{Action classification performances in the MSR-Action3D dataset. }
+\label{tab:msr3d}
 \end{table}
+
+%\paragraph{MSR-Action3D} Setup: subjects 1,3,5,7,9 for training, rest for
+%testing, using all 20 action categories. This dataset is more as a proof of
+%concept, that our model achieves near state-of-the-art accuracy in a standard
+%dataset.
+%In fact, omitting Tao el at. ICCV 2015 paper, we would achieve the
+%best accuracy. BUT, they do not provide the rich annotations for testing data
+%as our model. Also, we use the same initialization method to automatically
+%annotate the actions in the dataset: the initialization method is integrated
+%with the model and is independent of the dataset.
+
+%\paragraph{MSR-Action3D} A very popular skeleton + Depth single action dataset.
+%We use the common setup of using skeleton data from
+%, using all 20 action categories. We
+%use 557 videos from the dataset as proposed by \cite{Wang2012}. We use this
+%dataset to show how our model performs in a standard database of single
+%actions.
+
+
+\subsection{Recognition of Concurrent Actions}
+Our second experiment evaluates the performance of our model in a concurrent
+action recognition setting. In this scenario, the goal is to predict
+the temporal localization of actions that may occur concurrently in a long
+video.
+
+We evaluate this task on the Concurrent Actions dataset \cite{Wei2013},
+which
+provides 61 RGBD videos and pose estimation data annotated with 12
+action categories of interest.
+We use a similar evaluation setup as proposed by the authors.
+We split the dataset into training and testing sets with a 50\%-50\% ratio.
+We evaluate performance by measuring precision-recall: a detected action
+is declared as a true positive if its temporal overlap with the ground
+truth action interval is larger than 60\% of ther union, or if
+the detected interval is completely covered by the ground truth annotation.
+
+
+%\paragraph{Concurrent Action dataset} This dataset has 61 videos of variable
+%time, some of them are very long comoared to other action datasets. The videos
+%has a variable number of actions. The skeleton data and action annotations are
+%provided in the dataset.
+%We select randomly 50\% of videos for training and the
+%rest for testing.
+\todo[inline]{Ivan: no entiendo bien que es lo que pasa en los siguientes
+dos parrafos... [JC]}
+To apply our model we first cluster the data using the action
+labels for each video, using binary vectors where 1 indicate the action is
+present in the video, and 0 that the action is not present. We apply
+hierarchical clustering using euclidean distance, and find that using 7
+clusters is a good fit. These clusters represents activities, and we first find
+a good initialization for action labeling in four regions.
+
+We want to show using this dataset that the latent formulation achieve good
+recognition performance with respect to the model that uses this dataset. We
+can show also new annotations in this dataset, corresponding to the regions
+that are annotated with the actions. Our model gives a point in the
+precision/recall curve, since our model has no threshold or parameter that
+allows to adjust the recall, and in the  inference the labeling that maximizes
+the energy of the video is chosen. For this reason, we compare with
+\cite{Wei2013} using the same recall level.
+
+\begin{table}
+\centering
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Algorithm} & \textbf{Precision} & \textbf{Recall}\\
+\hline
+%Ours, GEO+VEL, NI, VL-KM-ST &  92.3\% & 0.81\% \\
+Our model &  92.3\% & 0.81\% \\
+\hline
+Wei et al. \cite{Wei2013} & 85.0\% & 0.81\% \\
+\hline
+\end{tabular}
+\caption{Action detection performances in the Concurrent Actions dataset. }
+\end{table}
+ 
+\subsection{Recognition of Composable Activities}
 
 \paragraph{Composable Activities Dataset} In this dataset we show several results. (1) Comparing TRAJ descriptor (HOF over trajectory); (2) Compare the results using latent variables for action assignations to regions, with different initializations; (3) Show results of the annotations of the videos in inference. This has been shown in CVPR2014, but I think we have to show better figures, at least more attractive. The interesting part id that we achieve comparable results of out method using latent variables in actions, compared to using all annotations. We must include figures comparing the real annotations and the inferred annotations for training data, to show we are able to get the annotations only from data.
 
@@ -83,24 +177,9 @@ VL-KM-ST   & 91.1\% \\
 \caption{Results in Composable Activities dataset, using V latent, showing different initializations. }
 \end{table}
 
-\paragraph{Concurrent Action dataset} This dataset has 61 videos, some of them are very long, and most are short. The videos has a variable number of actions. The skeleton data and action annotations are provided. To apply the model we first cluster the data using the action labels for each video, using binary vectors where 1 indicate the action is present in the video, and 0 that the action is not present. We apply hierarchical clustering using euclidean distance, and find that using 7 clusters is a good fit. These clusters represents activities, and we first find a good initialization for action labeling in four regions. For testing, we only use the action labeling, using the same evaluation setup as in \cite{Wei2013}: a detected action interval is taken as correct if the overlapping length of the detected interval and the ground truth interval is larger 60\% than their union length or the detected interval is totally covered by the ground truth interval. The training/testing split is 50/50, chosen randomly, the same as in \cite{Wei2013}.
+ 
+\subsection{Action Recognition in RGB Videos}
 
-We want to show using this dataset that the latent formulation achieve good recognition performance with respect to the model that uses this dataset. We can show also new annotations in this dataset, corresponding to the regions that are annotated with the actions. Our model gives a point in the precision/recall curve, since our model has no threshold or parameter that allows to adjust the recall, and in the  inference the labeling that maximizes the energy of the video is chosen. For this reason, we compare with \cite{Wei2013} using the same recall level.
-
-\begin{table}
-\centering
-\begin{tabular}{|l|c|c|}
-\hline
-\textbf{Algorithm} & \textbf{Precision} & \textbf{Recall}\\
-\hline
-Ours, GEO+VEL, NI, VL-KM-ST &  92.3\% & 0.81\% \\
-\hline
-Wei et al. \cite{Wei2013} & 85.0\% & 0.81\% \\
-\hline
-\end{tabular}
-\caption{Results in Concurrent Action dataset. }
-\end{table}
-  
  \paragraph{sub-JHMDB} In this dataset, we use the annotated joints provided to build our geometric descriptor. Only 15 joints per frame are annotated, and the coordinates of the joins are in 2D image coordinates. We first translate the 15 joints into 20 joints, and also create a \emph{pseudo} 3D data by adding a $z=0$ coordinate to the joints, adding $d$ to the joints of wrists and knees, and subtracting $d$ for elbows, to create a 3D skeleton suitable to our model. AS RGB videos are available, we compute the TRAJ feature as in Composble Acivities Dataset (explain better).
 
 In this dataset is clear tee benefits of all the components of the model: as we only have a single action label per video, we use the initialization of videos to get a better representation of the actions in the videos. As this dataset is from videos \emph{on the wild}, the camera view varies from video to video, making this dataset specially suitable to our algorithm of multiple classifiers per semantic action. Finally, the same as the rest of datasets, including the garbage collector math in the model allows to get a more discriminative model as it feeds the pose classifiers only with most informative poses. For a fair comparison, we compare our method with works that used the ground truth joints. We show in the results the mean accuracy over three splits, provided in the dataset.
@@ -123,6 +202,27 @@ Ch\'eron et al. \cite{Cheron2015} & 72.5\%\\
 \caption{Results in sub-JHMDB dataset. }
 \end{table}
 
+
+\subsection{Spatio-temporal Annotation of Atomic Actions}
+
+\subsection{Model Analysis}
+
+\subsection{Qualitative Results}
+
+\begin{comment}
+\todo[inline]{texto a continuación es original de Ivan}
+
+[GENERAL IDEA]
+
+What we want to show:
+\begin{itemize}
+\item Show tables of results that can be useful to compare the model.
+\item Show how the model is useful for videos of simple and composed actions, since now the level of annotations is similar.
+\item Show how the inference produces annotated data (poses, actions, etc). In particular, show in Composable Activities and Concurrent actions how the action compositions are handled by the model without post-processing.
+\item Show results in sub-JHMDB,showing how the model detects the action in the videos and also which part of the body performs the action (search for well-behaved videos). It could be interesting to show the annotated data over real RGB videos. 
+\item Show examples of poses (like poselets) and sequences of 3 or 5 poses for actions (Actionlets?)
+\end{itemize}
+
 \subsection{Figures}
 The list of figures should include:
 \begin{itemize}
@@ -133,12 +233,9 @@ The list of figures should include:
 \item Show Composable Activities and sub-JHMDB  the most representative poses and actions.
 \end{itemize}
 
-\subsection{Notes}
-I'm testing in JHMDB dataset, hopefully we will have results on Thursday.
 
 %\input{experiments_simple}
 % Here we explain the databases, give implementation details, and all the extra info needed to understand the following sections.
-\begin{comment}
 \subsection{Recognition of composable activities}
 \label{subsec:experiments_summary}
 %\input{experiments_composable}
