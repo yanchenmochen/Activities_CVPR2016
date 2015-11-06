@@ -97,6 +97,13 @@ is declared as a true positive if its temporal overlap with the ground
 truth action interval is larger than 60\% of ther union, or if
 the detected interval is completely covered by the ground truth annotation.
 
+Note that at inference time, our model outputs a single labeling per video,
+which corresponds to the action labeling that maximizes the energy of our
+model. Since there are no thresholds to adjust, our model produces a single
+precision-recall measurement as reported in Table \ref{tab:concurrent}.
+We observe that our model outperforms the state-of-the-art method in this
+dataset at that recall level.
+
 
 %\paragraph{Concurrent Action dataset} This dataset has 61 videos of variable
 %time, some of them are very long comoared to other action datasets. The videos
@@ -116,11 +123,8 @@ a good initialization for action labeling in four regions.
 We want to show using this dataset that the latent formulation achieve good
 recognition performance with respect to the model that uses this dataset. We
 can show also new annotations in this dataset, corresponding to the regions
-that are annotated with the actions. Our model gives a point in the
-precision/recall curve, since our model has no threshold or parameter that
-allows to adjust the recall, and in the  inference the labeling that maximizes
-the energy of the video is chosen. For this reason, we compare with
-\cite{Wei2013} using the same recall level.
+that are annotated with the actions.
+
 
 \begin{table}
 \centering
@@ -135,6 +139,7 @@ Wei et al. \cite{Wei2013} & 85.0\% & 0.81\% \\
 \hline
 \end{tabular}
 \caption{Action detection performances in the Concurrent Actions dataset. }
+\label{tab:concurrent}
 \end{table}
  
 \subsection{Recognition of Composable Activities}
