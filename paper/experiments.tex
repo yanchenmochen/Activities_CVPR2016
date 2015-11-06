@@ -133,9 +133,9 @@ dataset at that recall level.
 \textbf{Algorithm} & \textbf{Precision} & \textbf{Recall}\\
 \hline
 %Ours, GEO+VEL, NI, VL-KM-ST &  92.3\% & 0.81\% \\
-Our model &  92.3\% & 0.81\% \\
+Our model &  0.92 & 0.81 \\
 \hline
-Wei et al. \cite{Wei2013} & 85.0\% & 0.81\% \\
+Wei et al. \cite{Wei2013} & 0.85 & 0.81 \\
 \hline
 \end{tabular}
 \caption{Action detection performances in the Concurrent Actions dataset. }
@@ -163,7 +163,8 @@ and regions that are involved in each atomic actions.
 \hline
 \textbf{Algorithm} & \textbf{Accuracy}\\
 \hline
-Our model &  91.1\% \\
+Our model, w/ spatial action labels &  91.8\% \\
+Our model, w/o spatial action labels (VL) & 91.1\%\\
 %Ours, GEO+TRAJ &  91.1\% \\
 %Ours, GEO+TRAJ, NI  & 91.8\% \\
 %Ours, GEO+TRAJ, NI, VL-KM-ST   & 91.1\% \\
@@ -175,6 +176,7 @@ HMM & 78.9\%  \\
 Cao et al. \cite{cao2015spatio} & 79.0\% \\
 H-BoW & 82.4\%   \\
 2-lev-HIER & 83.8\%  \\
+Lillo et al. \cite{Lillo2014} & 85.7\% \\
 \hline
 \end{tabular}
 \caption{Results in Composable Activities dataset. }
@@ -252,6 +254,20 @@ VL-KM-ST   & 91.1\% \\
 \label{tab:initialization}
 \end{table}
 
+\begin{table}
+\centering
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Testing setup} & \textbf{Precision} & \textbf{Recall}\\
+\hline
+In testing set   & 0.62 & 0.78 \\
+In training set  & 0.67 & 0.85 \\
+In training set, temporal spaning  & 0.86 & 0.90\\ ~~of actions known & &  \\
+\hline
+\end{tabular}
+\caption{Results in Composable Activities dataset, using V latent, showing how the original action annotations are recovered depending on the testing setup. }
+\label{tab:initialization}
+\end{table}
 
 \subsection{Qualitative Results}
 
