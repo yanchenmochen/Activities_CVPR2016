@@ -69,13 +69,12 @@ Briefly, these models learn local dictionaries that capture
 appearance and motion patterns of different body parts. We refer to these local 
 patterns as motion poselets \cite{Bourdev:EtAl:2010, Tao2015}. These
 dictionaries are then used to construct BoW representations for the training
-videos, that in turn are used to learn action classifiers. Similarly to
-\cite{Lillo2014, Tao2015}, we formulate learning as an energy minimization
+videos, that in turn are used to learn action classifiers.
+We formulate learning as an energy minimization
 problem, where structural hierarchical relations are modeled by sub-energy
 terms that constraint compositions among
 motion poselets and actionlets, as well as, their spatial and 
-temporal relations
-\cite{Lillo2014}.
+temporal relations.
 
 Our model has some key novel properties with respect to previous work.
 Our model infers \emph{both at test and training time},
@@ -95,10 +94,12 @@ contributions.
 \emph{(1)}Motion poselets: at training time our hierarchical model includes a 
 new semi-supervised mechanism to learn dictionaries of relevant body 
 part configurations or motion poselets. A test time our model is able to 
-automatically infer the presence and temporal spam of each motion poselet.
+automatically infer the presence and temporal span of each motion poselet.
+%\emph{(2)}Actionlets: our hierarchical model includes a 
+%semi-supervised mechanism to infer dictionaries of relevant body 
+%part configurations or motion poselets.
 \emph{(2)}Actionlets: our hierarchical model includes a 
-semi-supervised mechanism to infer dictionaries of relevant body 
-part configurations or motion poselets. 
+semi-supervised mechanism to infer dictionaries of relevant action modes or actionlets.
 \emph{(3)}Garbage collector: our model includes a mechanism that
 selectively filter-out noisy and irrelevant spatial and temporal areas of the
 input videos.
@@ -107,9 +108,11 @@ combination of the previous
 contributions in a single hierarchical model result in a more informative and 
 accurate solution than previous state-of-the-art approaches.
 
-The rest of the paper is organized as follows:
-Section \ref{sec:related_work} reviews related work;
-Section \ref{sec:model} describes the proposed method;
-Section \ref{sec:experiments}  presents qualitative and quantitative experiments
-on standard benchmark datasets;
-and Section \ref{sec:conclusions} presents concludes the paper.
+In the rest of the paper we review related previous work
+(Sec.~\ref{sec:related_work}),
+describe the proposed method
+(Sec.~\ref{sec:model}),
+present qualitative and quantitative experiments
+on benchmark datasets
+(Sec.~\ref{sec:experiments});
+and close with conclusions (Sec.~\ref{sec:conclusions}).
