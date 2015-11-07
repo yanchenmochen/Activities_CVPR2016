@@ -57,7 +57,7 @@ of training data to achieve good generalization.
 
 While most of previous work has focused on recognizing single and isolated
 simple actions, in this paper we are interested in the recognition
-of complex, composable \cite{Lillo2014} and concurrent \cite{Wei2013} actions
+of complex, composable and concurrent actions
 and activities. In this setting, a person may be executing multiple actions
 simultaneously, or in sequence, instead of performing each action in isolation.
 An example of these is the earlier work of Ramanan and Forsyth \cite{Ramanan2003},
@@ -66,9 +66,9 @@ Wei \etal \cite{Wei2013}.
 Another recent trend aims at fine-grained detection of actions performed in sequence
 such as those in a cooking scenario \cite{Rohrbach2012, Lan2015}.
 
-We build our model upon several of these ideas in the literature. Our model
+We build our model upon several of these ideas in the literature. Our method
 extends the state-of-the-art by introducing a model that can perform
-detailed annotation of videos during testing time, but requires weak
+detailed annotation of videos during testing time, but only requires weak
 supervision at training time. While learning can be done with
 reduced lables, the hiearchical structure of poselets and actionlets combined
 with other key mechanisms enable our model to achieve improved

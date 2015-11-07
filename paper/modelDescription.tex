@@ -53,17 +53,21 @@ spatial regions.}
 
 \subsection{Body regions}
 We divide the body pose into $R$ fixed spatial regions and independently compute 
-a pose feature vector for each region. Fig. \ref{fig:skeleton_limbs_regions} 
+a pose feature vector for each region. Figure \ref{fig:skeleton_limbs_regions} 
 illustrates the case when $R = 4$ that we use in all our experiments. Our body 
 pose feature vector consists of the concatenation of two descriptors. At frame 
 $t$ and region $r$, a descriptor $x^{g}_{t,r}$ encodes geometric information 
 about the spatial configuration of body joints, and a descriptor $x^{m}_{t,r}$ 
-encodes local motion information around each body joint position. Following 
-\cite{Lillo2014}, our geometric descriptor is based on angles between segments 
+encodes local motion information around each body joint position.
+%Following 
+%\cite{Lillo2014},
+Our geometric descriptor is based on angles between segments 
 connecting two joints, and angles between these segments and a plane formed by 
-three joints (see \cite{Lillo2014} for details). Following \cite{WangCVPR2011}, 
-our motion descriptor is based on tracking motion trajectories of key points, in 
-our case, joint positions. Specifically, we compute at each joint location a HOF 
+three joints.
+% Following \cite{WangCVPR2011},
+Our motion descriptor is based on tracking motion trajectories of key points
+\cite{WangCVPR2011}, which in our case coincide with body joint positions.
+Specifically, we compute at each joint location a HOF 
 using RGB patches centered at the joint location for a temporal window of 15 
 frames. At each joint location, this produces a 108-dimensional descriptor,  
 that we concatenate across all joints inside a region to obtain our motion descriptor. Finally, 
@@ -84,8 +88,8 @@ our model. Finally, at the bottom level, our model identifies local body poses
 using a bank of linear classifiers that are applied to the incoming frame 
 descriptors. 
 
-Similarly to previous works \cite{Lillo2014, Taralova:EtAl:2014}, we build 
-each layer of our hierarchical model on top of BoW 
+%Similarly to previous works \cite{Lillo2014, Taralova:EtAl:2014}
+We build each layer of our hierarchical model on top of BoW 
 representations. To this end, at the bottom level of our hierarchy, and for 
 each body region, we learn a dictionary of body part configurations that we 
 refer to as motion poselets. Similarly, at the mid-level of our hierarchy, and 
