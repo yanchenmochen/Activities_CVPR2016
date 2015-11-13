@@ -3,7 +3,7 @@
 \textbf{Initial actionlet labels.} A relevant step of our training process is to obtain a suitable initialization 
 of latent variables. This is challenging task because, at each time 
 interval, each labeled action can be associated with any of the possible 
-subsets of R body regions. Fortunately, the machinery of self-paced 
+subsets of $R$ body regions. Fortunately, the machinery of self-paced 
 learning \cite{Kumar:EtAl:2010} provides us with a suitable solution. Specifically, we 
 formulate the association problem between actions and body regions as an 
 optimization problem. We constrain this optimization using two structural 
@@ -89,7 +89,7 @@ dynamic programming (see Section \ref{subsec:inference}), and then solving for
 $W$ via 1-slack formulation using Cutting Plane algorithm 
 \cite{Joachims2009}. 
 
-Loss function $\Delta((y_i,V_i),(y,V))$ penalizes inference errors during 
+The role of the loss function $\Delta((y_i,V_i),(y,V))$ is to penalize inference errors during 
 training. As the spatial ordering of actionlets is unknown (hence the latent 
 actionlet formulation), but the temporal composition is know, we can compute a 
 list $A_t$ of possible actionlets for frame $t$, and include  that information 
