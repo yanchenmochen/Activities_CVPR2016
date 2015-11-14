@@ -1,0 +1,278 @@
+\documentclass[10pt,letterpaper]{article}
+
+\usepackage{cvpr}
+\usepackage{times}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% Include other packages here, before hyperref.
+\usepackage{fullpage}
+\usepackage{enumerate}
+\usepackage{latexsym}
+\usepackage{amsbsy}
+\usepackage{epstopdf}
+\usepackage{verbatim}
+\usepackage{color}
+\usepackage{transparent}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{pifont}
+\usepackage[toc,page]{appendix}
+
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator*{\argmin}{argmin}
+\newcommand{\JC}[1]{{\color{red}[#1]}}
+\newcommand{\IL}[1]{{\color{blue}[#1]}}
+\newcommand{\+}[1]{\ensuremath{{\boldsymbol #1}}}
+\newcommand{\textforreview}{\textcolor{black}}
+
+\usepackage[colorinlistoftodos,prependcaption,textsize=small]{todonotes}
+
+% If you comment hyperref and then uncomment it, you should delete
+% egpaper.aux before re-running latex.  (Or just hit 'q' on the first latex
+% run, let it finish, and you should be clear).
+\usepackage[pagebackref=true,breaklinks=true,letterpaper=true,colorlinks,bookmarks=false]{hyperref}
+
+%\newcommand{\+}[1]{\ensuremath{{\boldsymbol #1}}}
+
+
+% \cvprfinalcopy % *** Uncomment this line for the final submission
+
+\def\cvprPaperID{1852} % *** Enter the CVPR Paper ID here
+\def\httilde{\mbox{\tt\raisebox{-.5ex}{\symbol{126}}}}
+
+% Pages are numbered in submission mode, and unnumbered in camera-ready
+\ifcvprfinal\pagestyle{empty}\fi
+\begin{document}
+
+
+
+
+
+%%%%%%%%% TITLE
+\title{A Hierarchical Pose-Based Approach to Complex Action Understanding Using
+Dictionaries of Actionlets and Motion Poselets:\\Supplementary material}
+
+\author{First Author\\
+Institution1\\
+Institution1 address\\
+{\tt\small firstauthor@i1.org}
+% For a paper whose authors are all at the same institution,
+% omit the following lines up until the closing ``}''.
+% Additional authors and addresses can be added with ``\and'',
+% just like the second author.
+% To save space, use either the email address or home page, not both
+\and
+Second Author\\
+Institution2\\
+First line of institution2 address\\
+{\tt\small secondauthor@i2.org}
+}
+
+\maketitle
+%\thispagestyle{empty}
+
+
+
+
+%%%%%%%%% ABSTRACT
+%\begin{abstract}
+%\input{abstract.tex}
+%\end{abstract}
+%
+%%%%%%%%%% BODY TEXT
+%\section{Introduction} \label{sec:introduction}  \input{introduction}
+%%\input{introduction_IL}
+%%
+%%----------------------------------------------------------------
+%%
+%\section{Related Work} \label{sec:related_work}  \input{relatedWork}
+%%
+%%-------------------------------------------------------------------------
+%%
+%\section{Model Description} \label{sec:model} \input{modelDescription}
+%%
+%%-------------------------------------------------------------------------
+%%
+%\section{Experiments} \label{sec:experiments} \input{experiments}
+%%
+%%-------------------------------------------------------------------------
+%%
+%\section{Conclusions and Future Work} \label{sec:conclusions} \input{conclusion}
+%
+%{\small
+%\bibliographystyle{ieee}
+%\bibliography{AsaReferences_no_url,references,library_niebles_no_url,ILReferences_no_url,ivan}
+%}
+
+
+\section{Extended figures}
+
+We extend the qualitative results of the paper including new figures. In Figure \ref{fig_actionlets}, we show high scored frames which were labeled with the corresponding actionlet during testing, using sub-JHMDB dataset. In Figure \ref{fig_poses}, we show an extended set of motion poselets learned from Composable Activities dataset. 
+
+\begin{figure}[tb]
+\begin{center}
+\includegraphics[width=0.999\linewidth]{../Fig/fig_actionlets_subJHMDB.pdf}
+\end{center}
+\caption{Examples of actionlets using high-scored frames, for testing videos in sub-JHMDB dataset. Actionlets 2 ans 3 belong to the \textit{catch} action, Actionet 10 and 11 to \emph{golf} action, Actionlet 25 to \emph{pick} and Actionlet 32 to \emph{push}. Note that actionlets are highly related to poses and movements of the subjects in the videos.}
+\label{fig_actionlets}
+\end{figure}
+
+\begin{figure}[tb]
+\begin{center}
+\includegraphics[width=0.999\linewidth]{../Fig/fig_poses_complete.pdf}
+\end{center}
+\caption{Extended figure of Figure 4 in the paper, of motion poselets automatically learned from the Composable Activities dataset.  }
+\label{fig_poses}
+\end{figure}
+
+
+\section{Extended math of the model}
+
+In this section we give a more detailed description of the math behind our model. As we describe in the paper, we use an energy-based model, solving the parameters using a Latent Structrual SVM (LSSVM) formulation.
+
+
+\subsection*{Definitions}
+\begin{itemize}
+\item $T$: number of frames of the sequence.
+\item $R$: number of spatial regions of each frame.
+\item $C$: number of activities
+\item $G$: number of semantic actions
+\item $A$: total number of atomic action classifiers
+\item $K$: size of pose dictionary
+\item $t$: index of frame, $t \in \{1,\dots,T\}$.
+\item $r$: index of region, $r \in \{1,\dots,R\}$.
+\item $c$: index of activity, $c \in \{1,\dots,C\}$.
+\item $g,g'$: index of semantic action, $g,g' \in \{1,\dots,G\}$.
+\item $a$: index of atomic sequence, $a \in \{1,\dots,A\}$
+\item $k$: index of pose, $k \in \{1,\dots,K\}$.
+\end{itemize}
+
+\subsection*{Notation used in this document}
+Three shortened notations are used across the document:
+\begin{itemize}
+\item $\sum_x$ refers to $\sum_{x=1}^X$, with $x$ some index defined in the last section.
+\item $\sum_{x,y,...}$ refers to $\sum_x \sum_y \cdots$.
+\item $\delta_a^b$ refers to Kronecker delta function $\delta(a = b)$.
+\end{itemize}
+
+
+\subsection{Model}
+
+We define the energy function using five potentials:
+\begin{equation}
+E = E_{\text{activity}} + E_{\text{action}} + E_{\text{pose}}
+  + E_{\text{action transition}} + E_{\text{pose transition}}.
+\end{equation}
+
+At the lowest level of the hierarchy, $Z^\top = (z_{1,1} \dots
+z_{T,R})$ assigns poses to entries in the
+dictionary. In particular $z_{t,r}=k$ assigns pose (dictionary word) $k$ to
+region $r$ in frame $t$. 
+
+\begin{equation}
+E_{\text{pose}} = \sum_{r,t} ({w^r_{z_{t,r}}}^\top x_{t,r}\delta(z_{t,r}\le K) + \theta^r\delta(z_{t,r}=K+1))= \sum_{r,t,k} ({w^r_{k,r}}^\top x_{t,r} \delta_{z_{t,r}}^k\delta(z_{t,r} \le K)+\theta^r\delta(z_{t,r}=K+1)) 
+\end{equation}
+
+
+
+At second level, we assume that we have atomic sequence labels for each frame and region, grouped in a vector $V^\top = [v_{1,1},\dots,v_{T,R}]$  (if we do not have that information, we must estimate the atomic sequence labels).
+$h^{a,r}(Z, V)$ is the histogram over the pose
+dictionary, at those frames assigned to atomic sequence $a$ in region $r$.
+Each entry $k$ in
+$h^{a,r}(Z,V)$ is given by:
+\begin{equation}
+\label{eq:histogram_poses_actions}
+h_{k}^{a,r}(Z, V) =  \sum_{t} \delta_{z_{t,r}}^k \delta_{v_{t,r}}^a
+\end{equation}
+
+\begin{equation}
+E_{\text{action}} = \sum_{r,a} {\beta^r_{a}}^\top h^{a,r}(Z, V) = \sum_{r,a,t,k} \beta^r_{a,k} \delta_{z_{t,r}}^k \delta_{v_{t,r}}^a
+\end{equation}
+
+To associate the atomic sequences to semantic actions, each frame is annotated with a new label vector $U^\top = [u_{1,1},\dots.u_{T,R}]$, which indicates the semantic action that the action sequence label $v_{t,r}$ belongs in each frame and region. Recall that  the action sequence form disjoint groups, each group associated to a semantic action, so many atomic sequence labels values $a \in \{1,\dots,A\}$ are associated to a single semantic label value $g \in \{1,\dots,G\}$.
+\vspace{1em}
+
+At third level, $h^{r}(U)$ is the histogram corresponding to region $r$ over
+the semantic action labels accumulated over all frames. Each entry $g$ in $h^{r}(U)$ is
+given by:
+
+\begin{equation}
+h_g^{r}(U) = \sum_{t} \delta_{u_{t,r}}^g
+\end{equation}
+So the energy in the activity level is
+\begin{equation}
+E_{\text{activity}} = \sum_{r} {\alpha^r_{y}}^\top h^{r}(U) = \sum_{r,g,t}  \alpha^r_{y,g} \delta_{u_{t,r}}^g
+\end{equation}
+
+In terms of atomic sequences and pose transition, energies are defined
+as histograms over two consecutive frames,
+involving atomic sequences ($V$) and poses ($Z$):
+\begin{equation}
+E_{\text{action transition}} = \sum_{r,a,a'}  \gamma^r_{a',a} \sum_{t} \delta_{v_{t-1,r}}^{a'}\delta_{v_{t,r}}^a 
+\end{equation}
+
+\begin{equation}
+E_{\text{pose transition}} =\sum_{r,k,k'}  \eta^r_{k',k}\sum_{t}\delta_{z_{t-1,r}}^{k'}\delta_{z_{t,r}}^{k}
+\end{equation}
+
+Summarizing, we have three levels in the hierarchy. At the lowest level, we use the region descriptors to associate the region to a pose. In the middle level, we use pose histograms to associate poses to atomic sequences. Then, the atomic sequence labels are summarized into semantic actions, and at the highest level the histogram of semantic actions are used. The transition terms are computed over transitions of atomic sequences and poses. 
+ \vspace{1em}
+
+One problem we have to deal is how to assign the labels $V$ in each video. Assume for the moment we have the same annotations as Composable Activity, which have a single label for activity, and multiple spatial and temporal annotations for actions for each video. In terms of labels, this means we have the ground truth for the labels $U$ (semantic actions) for each video, and we need to estimate the labels $V$ of atomic sequences.  In general, we need to:
+\begin{enumerate}
+\item Find a suitable number of atomic sequences for each semantic action
+\item Assign the atomic sequences to each action annotation for all videos. Each atomic sequence must lie in the group conforming the same semantic action.
+\end{enumerate}
+
+We apply a simple method to find the number of atomic sequences for each semantic actions, first finding an appropriate number of clusters using Cattell's scree test to find the number of clusters for each video, which is not perfect but will give a high number of clusters to highly variant semantic actions, and a low number of clusters if the semantic actions are similar in all videos. Then, we find the initial $V$ using the cluster assignments. 
+
+%In terms of spatial relation among actions, we can model just co-ocurrence of
+%pair of actions in a pair of regions $r$ and $r'$ accumulated over all frames:
+%\begin{equation}
+%E_{\text{action spatial relation}} = \tau^\top v(V',V) = 
+%\sum_{a,a',r,r'} \tau_{a',a,r',r}  \sum_{t} \delta_{v_{t,r'}}^{a'}  \delta_{v_{t,r}}^a.
+%\end{equation}
+\vspace{1em}
+To learn the model parameters, we formulate the model in an optimization framework, where the goal is to find the best parameters $\alpha$, $\beta$, $w$, $\gamma$, $\eta$ and $\theta$ that yield to the best classification of the training set of $M$ videos.  We formulate our model using the following objective function:
+
+\begin{align}
+\label{eq:big_problem2}
+\begin{split}
+& \min_{\alpha, \beta, w,\gamma,\eta,\theta}
+      \Omega(\+{\alpha},\+{\beta},\+{w},\+{\gamma},\+{\eta},\+{\theta})
+       + \frac{C}{M} \sum_{i=1}^M \max_{Z,V,y}\left( E(X_i, Z,V,U, y) + \Delta( (y_i, U_i), (y, U)) -\max_{Z_i}{ E(X_i, Z_i,U_i,V_i,y_i)}\right), \\
+\end{split}
+\end{align}
+where $ \Omega(\+{\alpha},\+{\beta},\+{w},\+{\gamma},\+{\eta},\+{\theta})$ is a regularization term over the coefficients of the classifiers, visual dictionary and action/pose transition terms. $\Delta( (y_i, U_i), (y, U))$ is the loss function that measures the labeling performance of activities and actions. As we plan to use three levels of knowledge of semantic actions, we must use a different loss function according to what we know in advance:
+\begin{enumerate}[i.] 
+\item If we know the temporal spanning of semantic actions along with the spatial region each action is performed, then a loss function that favors predicting the correct labels at activity and semantic action levels is given by:
+\begin{equation}
+\label{loss_func1}
+\Delta( (y_i, U_i), (y, U)) =
+  \lambda_1 \delta(y_i \neq y)
++  \frac{\lambda_2}{T}  \sum_{r,t} \delta(u_{{(t,r)}_i} \neq u_{t,r} ).
+\end{equation}
+\item If we only know the temporal spanning of the semantic actions, then we can no longer use the labels $u_{{(t,r)}_i}$ as known. Then, we only know which actions are performed in each frame. If we use the temporal information, we can form groups $S_{t}$ of semantic action labels for each frame, and use a loss function that favors predicting semantic actions to each frame belonging to the group $S_t$:
+\begin{equation}
+ \label{loss_func2}
+\Delta( (y_i, U_i), (y, U)) =
+  \lambda_1 \delta(y_i \neq y)
++  \frac{\lambda_2}{T}  \sum_{r,t} \delta(u_{{(t,r)}} \notin S_{t} ).
+\end{equation}
+%\item If we only know the semantic actions that belongs to each video, but have no temporal or spatial information, them we can form groups $S$ of semantic actions for each video, and add a inertial term to tackle with the loss of structure of the videos. The loss function in this case could be
+%\begin{equation}
+% \label{loss_func3}
+%\Delta( (y_i, U_i), (y, U)) =
+%  \lambda_1 \delta(y_i \neq y)
+%+  \frac{\lambda_2}{T}  \sum_{r,t} \delta(u_{{(t,r)}} \notin S ).
+%+  \frac{\lambda_3}{T}  \sum_{r,t} \delta(u_{{(t,r)}} \neq u_{{(t-1,r)}})
+%\end{equation}
+\end{enumerate}
+\vspace{0.3cm}
+We solve Equation \ref{eq:big_problem2} using a standard Latent SVM formulation usinc CCCP algorithm and cutting-plane optimization using the 1-slack formulation. In particular, as the labels are temporally connected, we solve a Dynamic Programming problem in each cutting plane iteration to fint the most violated constraint. This optimization is solved efficiently, computing non-sequential terms first and then using only a subset of the best action and pose labeling for each frame, which reduces the problem from $\mathcal{O}(TA^2K^2)$ to $\mathcal{O}(TP^2)$, where  $P<<AK$.
+
+
+\end{document}
