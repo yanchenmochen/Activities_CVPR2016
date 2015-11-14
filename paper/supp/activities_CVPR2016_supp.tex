@@ -219,7 +219,11 @@ E_{\text{pose transition}} =\sum_{r,k,k'}  \eta^r_{k',k}\sum_{t}\delta_{z_{t-1,r
 Summarizing, we have three levels in the hierarchy. At the lowest level, we use the region descriptors to associate the region to a pose. In the middle level, we use pose histograms to associate poses to atomic sequences. Then, the atomic sequence labels are summarized into semantic actions, and at the highest level the histogram of semantic actions are used. The transition terms are computed over transitions of atomic sequences and poses. 
  \vspace{1em}
 
-One problem we have to deal is how to assign the labels $V$ in each video. Assume for the moment we have the same annotations as Composable Activity, which have a single label for activity, and multiple spatial and temporal annotations for actions for each video. In terms of labels, this means we have the ground truth for the labels $U$ (semantic actions) for each video, and we need to estimate the labels $V$ of atomic sequences.  In general, we need to:
+Due to the lack of supervision to link body regions and atomic actions, we need to automatically
+%One problem we have to deal is how to
+assign the labels $V$ in each video. Assume for the moment we had full supervision that provides a global video activity label, and spatio-temporal annotations that link body regions and atomic actions through time.
+% the same annotations as Composable Activity, which have a single label for activity, and multiple spatial and temporal annotations for actions for each video.
+In terms of labels, this means we have the ground truth for the labels $U$ (semantic actions) for each video, and we need to estimate the labels $V$ of atomic sequences.  In general, we need to:
 \begin{enumerate}
 \item Find a suitable number of atomic sequences for each semantic action
 \item Assign the atomic sequences to each action annotation for all videos. Each atomic sequence must lie in the group conforming the same semantic action.
